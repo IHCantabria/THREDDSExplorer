@@ -10,13 +10,19 @@ This plug-in should work with most THREDDS servers, and will be able to retrieve
 
 ## Installation
 
-To install this plug-in, copy the content to your QGIS plug-in directory:
-Usually these are the locations for plugins repository:
+**Dependencies:** THREDDSExplorer requires the *processing* plug-in by V. Olaya, available within the standard QGIS Installation (also at https://plugins.qgis.org/plugins/processing/).
 
-### For windows
+Installing the plug-in basically involves copying the code in a QGIS "plugins" directory, as detailed below. Recall that it is mandatory that the folder where the code resides is called "THREDDSExplorer". If you download the code in ZIP format the default name ("THREDDSExplorer-master") must be changed to "THREDDSExplorer".
+
+### For Windows
+
+The folder where the code should be copied is the following, substituting "`$username`" with your user name:
+
+    $ C:\Documents and Settings\$username\.qgis2\python\plugins
+
+If you want to install the plug-in for all the users in the system, you should use the following folder instead:
 
     $ C:\Program Files\QGIS\python\plugins
-    $ C:\Documents and Settings\$username\.qgis\python\plugins
 
 ### For Linux
 
@@ -42,9 +48,9 @@ In the examples above you can substitute the plugins directory for `/share/qgis/
     $ /Contents/MacOS/share/qgis/python/plugins
     $ /Users/$username/.qgis/python/plugins
 
-**NOTE**
+**NOTES**
 
-It is possible to define additional paths for QGIS to look for your plug-ins, by defining the `_QGIS_PLUGINPATH_` environment variable with a full path to the new desired plug-in folder.
+* It is possible to define additional paths for QGIS to look for your plug-ins, by defining the `_QGIS_PLUGINPATH_` environment variable with a full path to the new desired plug-in folder.
 
 ## User Manual
 
