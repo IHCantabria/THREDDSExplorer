@@ -18,13 +18,13 @@ Please note that it is mandatory that the folder where the code resides is calle
 
 ### For Windows
 
-The folder where the code should be copied is the following, substituting "`$USERNAME`" with your user name:
+The folder where the code should be copied is the following, substituting "`%USERNAME%`" with your user name:
 
-    $ C:\Documents and Settings\$USERNAME\.qgis2\python\plugins
+    C:\Documents and Settings\%USERNAME%\.qgis2\python\plugins
 
 If you want to install the plug-in for all the users in the system, you should use the following folder instead:
 
-    $ C:\Program Files\QGIS\python\plugins
+    C:\Program Files\QGIS\python\plugins
 
 ### For Linux
 
@@ -49,8 +49,8 @@ If you want to install the plug-in system-wide (for all the users), you can subs
 
 Installation on OS X has not been tested. Instead, the instructions at qgis.org have been followed (http://docs.qgis.org/1.8/en/docs/user_manual/plugins/plugins.html):
 
-    $ /Contents/MacOS/share/qgis/python/plugins
-    $ /Users/$USERNAME/.qgis/python/plugins
+    /Contents/MacOS/share/qgis/python/plugins
+    /Users/$USERNAME/.qgis/python/plugins
 
 **NOTES**
 
