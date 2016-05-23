@@ -14,16 +14,19 @@ Usually these are the locations for plugins repository:
 * For windows:
 	```
 	    $ C:\Program Files\QGIS\python\plugins
+
 		$ C:\Documents and Settings\$username\.qgis\python\plugins
     ```
 * For Linux:
 	```
 	    $ /share/qgis/python/plugins
+
 		$ ~/.qgis/python/plugins
     ```
 * For Mac OS X:
 	```
 	    $ /Contents/MacOS/share/qgis/python/plugins
+
         $ /Users/$username/.qgis/python/plugins
     ```
 
