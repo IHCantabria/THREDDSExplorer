@@ -36,4 +36,4 @@ Usually these are the locations for plugins repository:
 it is possible to define additional paths for QGIS to look for your plug-ins, by defining the `_QGIS_PLUGINPATH_` environment variable with a full path to the new desired plug-in folder.
 
 ## User Manual
-For more information you can find a .pdf manual under de "doc" folder.
+For more information you can find a PDF manual under the "doc" folder.
