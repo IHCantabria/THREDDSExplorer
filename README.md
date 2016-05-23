@@ -12,13 +12,15 @@ This plug-in should work with most THREDDS servers, and will be able to retrieve
 
 **Dependencies:** THREDDSExplorer requires the *processing* plug-in by V. Olaya, available within the standard QGIS Installation (also at https://plugins.qgis.org/plugins/processing/).
 
-Installing the plug-in basically involves copying the code in a QGIS "plugins" directory, as detailed below. Recall that it is mandatory that the folder where the code resides is called "THREDDSExplorer". If you download the code in ZIP format the default name ("THREDDSExplorer-master") must be changed to "THREDDSExplorer".
+Installing the plug-in basically involves copying the code in a QGIS "plugins" directory, as detailed below.
+
+Please note that it is mandatory that the folder where the code resides is called "THREDDSExplorer". If you download the code in ZIP format the default name ("THREDDSExplorer-master") must be changed to "THREDDSExplorer".
 
 ### For Windows
 
-The folder where the code should be copied is the following, substituting "`$username`" with your user name:
+The folder where the code should be copied is the following, substituting "`$USERNAME`" with your user name:
 
-    $ C:\Documents and Settings\$username\.qgis2\python\plugins
+    $ C:\Documents and Settings\$USERNAME\.qgis2\python\plugins
 
 If you want to install the plug-in for all the users in the system, you should use the following folder instead:
 
@@ -41,12 +43,14 @@ If you want to download a ZIP, you can also do so:
     $ mv THREDDSExplorer-master THREDDSExplorer
     $ rm master.zip
 
-In the examples above you can substitute the plugins directory for `/share/qgis/python/plugins/`, if you want to install the plugin system-wide, for all the users. In that case, you will have to use sudo or be root to `mkdir` the plugins folder, and download content to it.
+If you want to install the plug-in system-wide (for all the users), you can substitute the directory in the examples above with `/share/qgis/python/plugins/`. In that case, you will have to use sudo or be root to `mkdir` the plugins folder, and download content to it.
 
 ### For Mac OS X
 
+Installation on OS X has not been tested. Instead, the instructions at qgis.org have been followed (http://docs.qgis.org/1.8/en/docs/user_manual/plugins/plugins.html):
+
     $ /Contents/MacOS/share/qgis/python/plugins
-    $ /Users/$username/.qgis/python/plugins
+    $ /Users/$USERNAME/.qgis/python/plugins
 
 **NOTES**
 
