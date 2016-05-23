@@ -6,6 +6,8 @@ Data catalogues and maps are exposed to the user through a simple user interface
 
 This plug-in should work with most THREDDS servers, and will be able to retrieve any layer provided through WMS, WMS-T and/or WCS services published by the server.
 
+[![THREDDS Explorer](https://raw.githubusercontent.com/IHCantabria/THREDDSExplorer/master/doc/video.jpg)](https://vimeo.com/167414368)
+
 ## Installation
 
 To install this plug-in, copy the content to your QGIS plug-in directory:
