@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dockAnimationWidget</class>
+ <widget class="QDockWidget" name="dockAnimationWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>311</width>
+    <height>749</height>
+   </rect>
+  </property>
+  <property name="floating">
+   <bool>true</bool>
+  </property>
+  <property name="features">
+   <set>QDockWidget::AllDockWidgetFeatures</set>
+  </property>
+  <property name="allowedAreas">
+   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea|Qt::TopDockWidgetArea</set>
+  </property>
+  <property name="windowTitle">
+   <string>THREDDS Animator</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>265</width>
+     <height>532</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="tableLayerList">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="horizontalScrollMode">
+         <enum>QAbstractItemView::ScrollPerPixel</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addWCSButton">
+        <property name="text">
+         <string>Add WCS layer to animation...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addWMSButton">
+        <property name="text">
+         <string>Add WMS layer to animation...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addOtherButton">
+        <property name="text">
+         <string>Add external layer to animation...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="removeButton">
+        <property name="text">
+         <string>Remove selected layer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <item row="1" column="0" colspan="2">
+         <widget class="QCheckBox" name="loopCheckbox">
+          <property name="text">
+           <string>Loop animation</string>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="labelFrameRate">
+          <property name="toolTip">
+           <string>Defines for how long will each frame be shown.
+WARNING: If too low, some frames may be skipped due to rendering overload.</string>
+          </property>
+          <property name="text">
+           <string>Frame update rate</string>
+          </property>
+          <property name="buddy">
+           <cstring>frameRateSpinbox</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QPushButton" name="cancelButton">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="textVisible">
+           <bool>true</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="frameRateSpinbox">
+          <property name="toolTip">
+           <string>Defines for how long will each frame be shown.
+WARNING: If too low, some frames may be skipped due to rendering overload.</string>
+          </property>
+          <property name="suffix">
+           <string extracomment="milliseconds"> ms</string>
+          </property>
+          <property name="minimum">
+           <number>150</number>
+          </property>
+          <property name="maximum">
+           <number>10000</number>
+          </property>
+          <property name="singleStep">
+           <number>50</number>
+          </property>
+          <property name="value">
+           <number>500</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="labelTimeFrame">
+          <property name="toolTip">
+           <string>The (map) time which will pass in each frame of this animation.</string>
+          </property>
+          <property name="text">
+           <string>Time variation/frame</string>
+          </property>
+          <property name="buddy">
+           <cstring>daysFrameVariation</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QPushButton" name="buttonLoad">
+          <property name="text">
+           <string>Prepare animation</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QSpinBox" name="daysFrameVariation">
+            <property name="toolTip">
+             <string>The (map) time which will pass in each frame of this animation.</string>
+            </property>
+            <property name="suffix">
+             <string> days</string>
+            </property>
+            <property name="maximum">
+             <number>10000000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTimeEdit" name="timeFrameVariation">
+            <property name="toolTip">
+             <string>The (map) time which will pass in each frame of this animation.</string>
+            </property>
+            <property name="minimumTime">
+             <time>
+              <hour>0</hour>
+              <minute>0</minute>
+              <second>1</second>
+             </time>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QSpinBox" name="daysTolerance">
+            <property name="toolTip">
+             <string>How much deviation is accepted between the expected time to be shown in the next frame and the actual time of the map shown.
+ Useful when mixing maps which have slightly different times.</string>
+            </property>
+            <property name="suffix">
+             <string> days</string>
+            </property>
+            <property name="maximum">
+             <number>10000000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTimeEdit" name="timeTolerance">
+            <property name="toolTip">
+             <string>How much deviation is accepted between the expected time to be shown in the next frame and the actual time of the map shown.
+ Useful when mixing maps which have slightly different times.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label">
+          <property name="toolTip">
+           <string>How much deviation is accepted between the expected time to be shown in the next frame and the actual time of the map shown.
+ Useful when mixing maps which have slightly different times.</string>
+          </property>
+          <property name="text">
+           <string>Max time offset</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelInfo">
+        <property name="text">
+         <string>animation_info_label</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="animationSlider">
+        <property name="maximum">
+         <number>0</number>
+        </property>
+        <property name="singleStep">
+         <number>0</number>
+        </property>
+        <property name="pageStep">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="tickPosition">
+         <enum>QSlider::TicksAbove</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="playButton">
+        <property name="text">
+         <string>Play</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

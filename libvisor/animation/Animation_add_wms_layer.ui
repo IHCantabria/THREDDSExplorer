@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddLayerDialog</class>
+ <widget class="QDialog" name="AddLayerDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>296</width>
+    <height>166</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>296</width>
+    <height>166</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>296</width>
+    <height>166</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Add new layer to animation</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="minimumSize">
+      <size>
+       <width>278</width>
+       <height>13</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Selected map: </string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="layerSelector">
+     <item>
+      <property name="text">
+       <string>Select a layer...</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="styleSelectorLayout">
+     <item>
+      <widget class="QComboBox" name="graphicSelector"/>
+     </item>
+     <item>
+      <widget class="QComboBox" name="paletteSelector"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QComboBox" name="beginTimeSelector">
+     <item>
+      <property name="text">
+       <string>Animation begins at...</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="finishTimeSelector">
+     <item>
+      <property name="text">
+       <string>Animation finishes at...</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonAddLayer">
+     <property name="text">
+      <string>Add to layer list</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

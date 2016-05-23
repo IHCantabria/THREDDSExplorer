@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>THREDDSViewer</class>
+ <widget class="QDockWidget" name="THREDDSViewer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>272</width>
+    <height>690</height>
+   </rect>
+  </property>
+  <property name="floating">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>THREDDS Explorer</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Choose an available DataSet</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTreeWidget" name="tree_widget">
+          <property name="minimumSize">
+           <size>
+            <width>250</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <column>
+           <property name="text">
+            <string>SubDatasets and Maps</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>300</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>10000</width>
+            <height>500</height>
+           </size>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_WMS">
+           <attribute name="title">
+            <string>WMS</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="0" column="0">
+             <layout class="QVBoxLayout" name="tab_WMS_layout">
+              <item>
+               <widget class="QComboBox" name="combo_wms_layer"/>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="layout_wms_style">
+                <item>
+                 <widget class="QComboBox" name="combo_wms_style_type">
+                  <property name="toolTip">
+                   <string>Style draw type</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="combo_wms_style_palette">
+                  <property name="toolTip">
+                   <string>Style color palette to use</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="WMSLabelTimeRange">
+                <property name="text">
+                 <string>Time range to download:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_wms_time">
+                <property name="toolTip">
+                 <string>First time value to download for this layer</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_wms_time_last">
+                <property name="toolTip">
+                 <string>Last time value to download for this layer
+(If set, will download all the layers between the first and last times)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="WMSBoundingBoxInfo">
+                <property name="text">
+                 <string>No bounding box info available</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="WMS_Bounds">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="WMS_westLabel">
+                  <property name="text">
+                   <string>West Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="WMS_northLabel">
+                  <property name="text">
+                   <string>North Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="WMS_eastLabel">
+                  <property name="text">
+                   <string>East Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLabel" name="WMS_southLabel">
+                  <property name="text">
+                   <string>South Bound</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_WCS">
+           <attribute name="title">
+            <string>WCS</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <layout class="QVBoxLayout" name="tab_WCS_layout">
+              <item>
+               <widget class="QComboBox" name="combo_wcs_coverage"/>
+              </item>
+              <item>
+               <widget class="QLabel" name="WCSLabelTimeRange">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>25</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Time range to download:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_wcs_time">
+                <property name="toolTip">
+                 <string>First time value to download for this layer</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="combo_wcs_time_last">
+                <property name="toolTip">
+                 <string>Last time value to download for this layer
+(If set, will download all the layers between the first and last times)</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="WCSBoundingBoxInfo">
+                <property name="text">
+                 <string>No bounding box info available</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="WCS_Bounds">
+                <item row="0" column="1">
+                 <widget class="QLabel" name="WCS_northLabel">
+                  <property name="text">
+                   <string>North Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="WCS_westLabel">
+                  <property name="text">
+                   <string>West Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="WCS_eastLabel">
+                  <property name="text">
+                   <string>East Bound</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLabel" name="WCS_southLabel">
+                  <property name="text">
+                   <string>South Bound</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="8" column="0">
+           <widget class="QPushButton" name="button_req_map">
+            <property name="maximumSize">
+             <size>
+              <width>256</width>
+              <height>23</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Show map in view</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QPushButton" name="button_req_animation">
+            <property name="text">
+             <string>Show animation menu &gt;&gt;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QComboBox" name="combo_dataset_list"/>
+      </item>
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="buttonManageServers">
+          <property name="text">
+           <string>Manage servers...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
