@@ -20,7 +20,7 @@ Please note that it is mandatory that the folder where the code resides is calle
 
 The folder where the code should be copied is the following, substituting "`%USERNAME%`" with your user name:
 
-    C:\Documents and Settings\%USERNAME%\.qgis2\python\plugins
+    C:\Users\%USERNAME%\.qgis2\python\plugins
 
 If you want to install the plug-in for all the users in the system, you should use the following folder instead:
 
