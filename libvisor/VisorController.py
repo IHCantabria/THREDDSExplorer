@@ -254,8 +254,8 @@ class VisorController(QObject):
         Potentially long-running operation to be done
         off the main thread.
          
-        Will post result through the calling application
-        queue so it can be processed in main thread.
+        Will post result through the mapImageRetrieved
+        signal to any registered listeners.
         """
         #print("_retrieveWMSMapImage"+layerName+"--"+timeRequested+"++"+str(threddsMapObject))
         if threddsMapObject is not None and threddsMapObject.getWMS() is not None:
@@ -268,7 +268,8 @@ class VisorController(QObject):
     def asyncFetchWMSImageFile(self, threddsMapObject, layerName, styleName, timeRangeRequested):
         """
         Will perform an async request for the layer to the WMS server,
-        and return it to the calling object through the provided Queue.
+        and return it to the calling object through the WMSprocessdone
+        signal.
         
         :param threddsMapObject: The map we want the image from.
         :type threddsMapObject:  threddsFetcherRecursos.Map
@@ -279,7 +280,7 @@ class VisorController(QObject):
         :param timeRangeRequested:  time dimension of the maps to be retrieved
         :type timeRangeRequested:   [str]
         
-        :returns: QGIS Raster Layer object through the View provided Queue object.
+        :returns: QGIS Raster Layer object through the WMSprocessdone signal.
         :rtype: QgsRasterLayer
         """
         if timeRangeRequested is None or len(timeRangeRequested) ==0:
@@ -310,7 +311,8 @@ class VisorController(QObject):
     def asyncFetchWCSImageFile(self, threddsMapObject, coverageName, timeRangeRequested):
         """
         Will perform an async request for the layer to the WCS server,
-        and return it to the calling object through the provided Queue.
+        and return it to the calling object through the WCSProcessdone
+        signal.
         
         :param threddsMapObject: The map we want the image from.
         :type threddsMapObject: threddsFetcherRecursos.Map
@@ -321,7 +323,7 @@ class VisorController(QObject):
         :param timeRangeRequested:  time dimension of the maps to be retrieved
         :type timeRangeRequested:   [str]
         
-        :returns: QGIS Raster Layer object through the View provided Queue object.
+        :returns: QGIS Raster Layer object through WCSProcessdone QtSignal.
         :rtype: QgsRasterLayer
         """
         #print("A time!")
@@ -351,8 +353,8 @@ class VisorController(QObject):
         Potentially long-running operation to be done
         off the main thread.
         
-        Will post result through the calling application
-        queue so it can be processed in main thread.
+        Will post result through the mapImageRetrieved signal
+        so it can be processed in main thread.
         """
         #print("_retrieveWCSMapImage"+coverageName+"--"+timeRequested+"++"+str(threddsMapObject))
         if threddsMapObject is not None and threddsMapObject.getWCS() is not None: 
