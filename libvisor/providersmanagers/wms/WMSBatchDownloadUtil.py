@@ -19,9 +19,9 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
     update, success or failure for the operation.
     
     """
-    # Custom signal which must return as first parameter, 
-    # a dictionary with time:layer as second, 
-    # the third is a reference to itself.
+    # Custom signal which must return as first paramete, 
+    # a dictionary with time:layer format, 
+    # and a reference to itself as second parameter.
     WMSprocessdone = pyqtSignal(dict, DownloadWorkerThread) 
     WMSFrameStartsDownload = pyqtSignal()
     WMSFrameFinishedDownload = pyqtSignal()
@@ -59,7 +59,7 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         self.inTimeFormat = "%Y-%m-%dT%H:%M:%SZ"
         self.outTimeFormat = "%Y-%m-%d %H:%M:%S"
         self.selfReference = self #Self reference is not accurate from method run() due to some strange issues
-                                    #when being called asynchronously.
+                                    #when being called synchronously.
         
         
         #We do not care (right now) in which phase of this check we are.
@@ -107,6 +107,5 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         if self.failedDownloads > 0:
             self.WMSMapDownloadFail.emit(self.failedDownloads, self.layerName)
             
-        #returning self.getJobName() as a hack. 
         self.WMSprocessdone.emit(self.getLayerDict(), self.selfReference)
         
