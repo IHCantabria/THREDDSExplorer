@@ -118,10 +118,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         persistenceManager = ServerDataPersistenceManager.ServerStorageManager()
         if persistenceManager.getDontShowGDALErrorAnymore() is False:
             try:
-
+    
                 from osgeo import gdal
-                if int(gdal.VersionInfo()) < 5000000:
-
+                if int(gdal.VersionInfo()) < 2000000:
+    
                     message = ("Your GDAL libraries version is outdated. Versions\n"
                                                   +"under 2.0 are not guaranteed to work when\n"
                                                   +"attempting to load WCS Layers.\n"
@@ -131,10 +131,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                                                   +"Versions under 2.0 are not guaranteed to work when\n"
                                                   +"attempting to load WCS Layers. If you have any issues,\n"
                                                   +"please update GDAL.")
-
+    
             reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
                      message, "Close", "Don't show again")
-
+    
             if reply == 1:
                 persistenceManager.setDontShowGDALErrorAnymore()
 

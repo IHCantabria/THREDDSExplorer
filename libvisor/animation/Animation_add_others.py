@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'F:\PROYECTOS_IH\trunk\Visor_WMS_QGIS\VisorWMS\libvisor\animation\Animation_add_others.ui'
+# Form implementation generated from reading ui file 'C:\Users\harol\Desktop\Eclipse Workspace\IH Public Projects\THREDDSExplorer\libvisor\animation\Animation_add_others.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -30,15 +30,6 @@ class Ui_Dialog(object):
         Dialog.setMaximumSize(QtCore.QSize(265, 999))
         self.verticalLayout = QtGui.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.addTeseoLayerButton = QtGui.QPushButton(Dialog)
-        self.addTeseoLayerButton.setObjectName(_fromUtf8("addTeseoLayerButton"))
-        self.verticalLayout.addWidget(self.addTeseoLayerButton)
-        self.placeholderButton1 = QtGui.QPushButton(Dialog)
-        self.placeholderButton1.setObjectName(_fromUtf8("placeholderButton1"))
-        self.verticalLayout.addWidget(self.placeholderButton1)
-        self.placeholderButton2 = QtGui.QPushButton(Dialog)
-        self.placeholderButton2.setObjectName(_fromUtf8("placeholderButton2"))
-        self.verticalLayout.addWidget(self.placeholderButton2)
         self.progressInfoLabel = QtGui.QLabel(Dialog)
         self.progressInfoLabel.setObjectName(_fromUtf8("progressInfoLabel"))
         self.verticalLayout.addWidget(self.progressInfoLabel)
@@ -48,8 +39,5 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Add a new animation", None))
-        self.addTeseoLayerButton.setText(_translate("Dialog", "Add a TESEO animated layer...", None))
-        self.placeholderButton1.setText(_translate("Dialog", "Placeholder 1", None))
-        self.placeholderButton2.setText(_translate("Dialog", "Placeholder 2", None))
         self.progressInfoLabel.setText(_translate("Dialog", "TextLabel", None))
 
