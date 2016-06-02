@@ -4,7 +4,7 @@ Created on 22 de feb. de 2016
 @author: IHC
 '''
 from THREDDSExplorer.libvisor.animation import Animation_add_others
-from PyQt4.QtGui import QWidget
+from PyQt4.QtGui import QWidget, QPushButton
 from PyQt4.QtCore import pyqtSlot, pyqtSignal
 from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
 from THREDDSExplorer.libvisor.animation.Animation2 import AnimationData
@@ -31,7 +31,7 @@ class AnimationOtherLayerManager(QWidget):
     *** Currently only used for TESEO Spill Simulator layers.
     
     This object will then access that module controller method to request
-    the user information to genereate that layer, and proceed to do so. 
+    the user information to generate that layer, and proceed to do so. 
     
     Advice: To simplify, stuff, you can check _onTeseoButtonClicked()
     method in this file as a template on how to do it to any layer.
@@ -57,22 +57,24 @@ class AnimationOtherLayerManager(QWidget):
         self.animationReadyObject = None
         self.animationReadyDetails = None
         self.dialog.progressInfoLabel.hide()
+        self.numberOfButtons = 0;
         #We set up the available buttons depending on
         #what other associated modules from IH are available
         #in user QGIS installation.
-        #TODO: Remove placeholders
         try:
             from TeseoSpillVisualizer.libteseo.MainController import MainController as TESEOController
+            button = QPushButton("Add a TESEO animated layer...")            
             self.TeseoController = TESEOController()
-            self.dialog.addTeseoLayerButton.clicked.connect(self._onTeseoButtonClicked)
+            button.clicked.connect(self._onTeseoButtonClicked)
+            self.dialog.verticalLayout.addWidget(button)
+            self.numberOfButtons = self.numberOfButtons + 1;
         except ImportError:
-            self.dialog.addTeseoLayerButton.setEnabled(False)
+            pass
         
-        try:
-            from placeholderModule import PlaceHolderClass
-        except ImportError:
-            self.dialog.placeholderButton1.setEnabled(False)
-            self.dialog.placeholderButton2.setEnabled(False)
+        if self.numberOfButtons == 0:
+            self.dialog.progressInfoLabel.setText("No supported modules were found.")
+            self.dialog.progressInfoLabel.show()
+            
         
     @pyqtSlot()
     def _onTeseoButtonClicked(self):

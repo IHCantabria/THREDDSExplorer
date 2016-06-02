@@ -27,27 +27,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QPushButton" name="addTeseoLayerButton">
-     <property name="text">
-      <string>Add a TESEO animated layer...</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="placeholderButton1">
-     <property name="text">
-      <string>Placeholder 1</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="placeholderButton2">
-     <property name="text">
-      <string>Placeholder 2</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QLabel" name="progressInfoLabel">
      <property name="text">
       <string>TextLabel</string>
