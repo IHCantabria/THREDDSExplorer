@@ -3,13 +3,14 @@ Created on 27 de ene. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtGui import QWidget
+from PyQt4.QtGui import QMessageBox, QWidget
 from PyQt4.QtCore import pyqtSignal, pyqtSlot, SIGNAL
 from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSParser import WCSparser
 from THREDDSExplorer.libvisor.animation import Animation_add_wcs_layer
 from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
 from urllib2 import HTTPError, URLError
 from _socket import timeout
+from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
 
 
 class AnimationWCSLayerManager(QWidget):
@@ -70,12 +71,15 @@ class AnimationWCSLayerManager(QWidget):
         
     @pyqtSlot(str)
     def _onSelectedCoverageChanged(self, QStringItem):
+        self.selectedCover = [x for x in self.coverages if x.getName() == QStringItem][0]
+        bbox = self.selectedCover.getBoundingBoxInfo();
         self.dialog.beginTimeSelector.clear()
         try:
             self.dialog.beginTimeSelector.addItems(self.dataList[str(QStringItem)])
         except KeyError:
             pass
         self._onSelectedBeginTime(0)
+        self.repopulateBBOX(bbox)
       
     @pyqtSlot(int)
     def _onSelectedBeginTime(self, position):
@@ -95,12 +99,42 @@ class AnimationWCSLayerManager(QWidget):
         allAvailableTimes = self.dataList[str(selectedLayer)]
         selectedBeginTimeIndex = allAvailableTimes.index(self.dialog.beginTimeSelector.currentText())
         selectedFinishTimeIndex = allAvailableTimes.index(self.dialog.finishTimeSelector.currentText())
-        
+        try:
+            north = float(self.dialog.northBound.text())
+            south = float(self.dialog.southBound.text())
+            east = float(self.dialog.eastBound.text())
+            west = float(self.dialog.westBound.text())
+        except ValueError:
+            box = QMessageBox()
+            box.setText("Bounding box values were not valid."
+            +"\nCheck only decimal numbers are used\n(example: 12.44)")
+            box.setIcon(QMessageBox.Critical)
+            box.exec_()
+            return
+                        
+        requestedBBOX = BoundingBox()
+        requestedBBOX.setCRS(self.selectedCover.getBoundingBoxInfo().getCRS())
+        requestedBBOX.setSouth(south)
+        requestedBBOX.setNorth(north)
+        requestedBBOX.setEast(east)
+        requestedBBOX.setWest(west)
         
         returnObject = AnimationLayer(self.mapObject,
                                       self.dialog.layerSelector.currentText(),
                                       allAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex+1],
-                                      "WCS")
+                                      "WCS",
+                                      boundingBox = requestedBBOX)
         self.animationLayerCreated.emit(returnObject)
+        
+    def repopulateBBOX(self, bboxInfoObject):
+        """
+        :param bboxInfoObject: The object with crs and bbox information
+        :type  bboxInfoObject BoundingBoxInfo.BoundingBox
+        """
+        self.dialog.northBound.setText(bboxInfoObject.getNorth())
+        self.dialog.southBound.setText(bboxInfoObject.getSouth())
+        self.dialog.eastBound.setText(bboxInfoObject.getEast())
+        self.dialog.westBound.setText(bboxInfoObject.getWest())
+        self.dialog.labelCRS.setText("CRS: "+bboxInfoObject.getCRS())
     
     

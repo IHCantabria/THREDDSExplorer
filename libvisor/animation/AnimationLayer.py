@@ -33,7 +33,7 @@ class AnimationLayer(object):
     '''
 
 
-    def __init__(self, mapObject, layerName, times, service, selectedStyle = None):
+    def __init__(self, mapObject, layerName, times, service, boundingBox = None, selectedStyle = None):
         '''
         :param    mapObject:    The map object which defines all the required
                                 information to access this map and it's layers
@@ -49,6 +49,9 @@ class AnimationLayer(object):
         :param    service:      The service used to retrieve the images
         :type     service:      [str] {WMS/WCS/...}
         
+        :param    boundingBox:      The service used to retrieve the images
+        :type     boundingBox:      BoundingBoxInfo
+        
         :param    selectedStyle:      The style this map will be drawn with (WMS only)
         :type     selectedStyle:      [str]
         '''
@@ -56,6 +59,7 @@ class AnimationLayer(object):
         self.layerName = layerName;
         self.times = times
         self.service = service
+        self.bbox = boundingBox
         self.style = selectedStyle
         self.animationData = None  #Animation2.AnimationData
         self.animationGroup = None #QgsLayerTreeGroup
@@ -74,6 +78,9 @@ class AnimationLayer(object):
     
     def getService(self):
         return self.service
+    
+    def getBBOX(self):
+        return self.bbox
     
     def setAnimationData(self, animationData):
         """
