@@ -248,7 +248,8 @@ class VisorController(QObject):
             return None
 
     
-    def _retrieveWMSMapImage(self, threddsMapObject,layerName,styleName,timeRequested):
+    def _retrieveWMSMapImage(self, threddsMapObject,layerName,styleName,
+                             timeRequested, boundingBox):
         """
         Async call to retrieve the image from server.
         Potentially long-running operation to be done
@@ -261,11 +262,12 @@ class VisorController(QObject):
         if threddsMapObject is not None and threddsMapObject.getWMS() is not None:
             self.standardMessage.emit("Downloading '"+layerName+"' [WMS], please wait...")
             lectorWMS = WMS.WMSparser(threddsMapObject.getWMS())
-            lectorWMS.createMapLayer(layerName,styleName,timeRequested)
+            lectorWMS.createMapLayer(layerName,styleName,boundingBox, timeRequested)
             resultImage = (lectorWMS.getLastCreatedMapLayer(),layerName,"WMS")
             self.mapImageRetrieved.emit(resultImage)
         
-    def asyncFetchWMSImageFile(self, threddsMapObject, layerName, styleName, timeRangeRequested):
+    def asyncFetchWMSImageFile(self, threddsMapObject, layerName, styleName,
+                                timeRangeRequested, boundingBox):
         """
         Will perform an async request for the layer to the WMS server,
         and return it to the calling object through the WMSprocessdone
@@ -285,10 +287,10 @@ class VisorController(QObject):
         """
         if timeRangeRequested is None or len(timeRangeRequested) ==0:
             threading.Thread(target = self._retrieveWMSMapImage,
-             args=(threddsMapObject,layerName,styleName,"")).start()   
+             args=(threddsMapObject,layerName,styleName,"", boundingBox)).start()   
         elif len(timeRangeRequested) == 1:
             threading.Thread(target = self._retrieveWMSMapImage,
-             args=(threddsMapObject,layerName,styleName,timeRangeRequested[0])).start()
+             args=(threddsMapObject,layerName,styleName,timeRangeRequested[0], boundingBox)).start()
         else:
             self.standardMessage.emit("Downloading maps, please wait...")
             wmsBatchWorkerThread = WMSDownloadWorkerThread(
@@ -296,6 +298,7 @@ class VisorController(QObject):
                 timeRangeRequested,
                 layerName,
                 styleName,
+                boundingBox,
                 jobName = threddsMapObject.getName()+"_"+layerName+"_"+styleName)
             thread = threading.Thread(target = wmsBatchWorkerThread.run)
             wmsBatchWorkerThread.WMSprocessdone.connect(self.BatchWorkerThreadDone)

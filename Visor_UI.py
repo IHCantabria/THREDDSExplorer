@@ -510,19 +510,51 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     except IndexError:
                         pass
             except Exception as exc:
-                print(exc)
                 self.postInformationMessageToUser("There was an error retrieving the WCS data.")
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WMS):
             try:
                 selectedBeginTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time.currentText())
                 selectedFinishTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time_last.currentText())+1
                 style = self.combo_wms_style_type.currentText()+r"/"+self.combo_wms_style_palette.currentText()
-                self.controller.asyncFetchWMSImageFile(self.currentMap,
-                                                        self.combo_wms_layer.currentText(),
-                                                        style,
-                                                        self.wmsAvailableTimes[selectedBeginTimeIndex
-                                                                               :selectedFinishTimeIndex])
-            except Exception:
+                
+                #We retrieve some information about the current selected map, useful
+                #to grab the actual CRS used by the map service. Should be changed if
+                #CRS is to be user-selectable later via dropdown menu or anything like
+                #that.
+                #Only one should be returned here.
+                if self.currentWMSMapInfo is not None:
+                    layerSelectedObject =  [ x for x in self.currentWMSMapInfo.getLayers()
+                                            if x.getName() == str(self.combo_wms_layer.currentText())]
+                    
+                #We retrieve the bounding box CRS information from the
+                #requested coverage, and get the actual box values
+                #from the UI.
+                if None is not layerSelectedObject or len(layerSelectedObject) > 0:
+                    try:
+                        north = float(self.WMS_northBound.text())
+                        south = float(self.WMS_southBound.text())
+                        east = float(self.WMS_eastBound.text())
+                        west = float(self.WMS_westBound.text())
+                    except ValueError:
+                        self.postCriticalErrorToUser("Bounding box values were not valid."
+                        +"\nCheck only decimal numbers are used\n(example: 12.44)")
+                        return
+                            
+                    BBinfo = layerSelectedObject[0].getBoundingBoxInfo()
+                    boundingBoxToDownload = BoundingBox()
+                    boundingBoxToDownload.setCRS(BBinfo.getCRS())
+                    boundingBoxToDownload.setEast(east)
+                    boundingBoxToDownload.setWest(west)
+                    boundingBoxToDownload.setNorth(north)
+                    boundingBoxToDownload.setSouth(south)
+                    self.controller.asyncFetchWMSImageFile(self.currentMap,
+                                                            self.combo_wms_layer.currentText(),
+                                                            style,
+                                                            self.wmsAvailableTimes[selectedBeginTimeIndex
+                                                                                   :selectedFinishTimeIndex],
+                                                            boundingBox = boundingBoxToDownload)
+            except Exception as exc:
+                print(exc)
                 self.postInformationMessageToUser("There was an error retrieving the WMS data.")
 
 

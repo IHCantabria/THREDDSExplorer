@@ -84,15 +84,19 @@ class Ui_THREDDSViewer(object):
         self.WMS_northLabel.setObjectName(_fromUtf8("WMS_northLabel"))
         self.WMS_Bounds.addWidget(self.WMS_northLabel, 1, 1, 1, 1)
         self.WMS_eastBound = QtGui.QLineEdit(self.tab_WMS)
+        self.WMS_eastBound.setEnabled(False)
         self.WMS_eastBound.setObjectName(_fromUtf8("WMS_eastBound"))
         self.WMS_Bounds.addWidget(self.WMS_eastBound, 1, 2, 1, 1)
         self.WMS_westBound = QtGui.QLineEdit(self.tab_WMS)
+        self.WMS_westBound.setEnabled(False)
         self.WMS_westBound.setObjectName(_fromUtf8("WMS_westBound"))
         self.WMS_Bounds.addWidget(self.WMS_westBound, 1, 0, 1, 1)
         self.WMS_southBound = QtGui.QLineEdit(self.tab_WMS)
+        self.WMS_southBound.setEnabled(False)
         self.WMS_southBound.setObjectName(_fromUtf8("WMS_southBound"))
         self.WMS_Bounds.addWidget(self.WMS_southBound, 2, 1, 1, 1)
         self.WMS_northBound = QtGui.QLineEdit(self.tab_WMS)
+        self.WMS_northBound.setEnabled(False)
         self.WMS_northBound.setObjectName(_fromUtf8("WMS_northBound"))
         self.WMS_Bounds.addWidget(self.WMS_northBound, 0, 1, 1, 1)
         self.tab_WMS_layout.addLayout(self.WMS_Bounds)
@@ -163,7 +167,7 @@ class Ui_THREDDSViewer(object):
         THREDDSViewer.setWidget(self.dockWidgetContents)
 
         self.retranslateUi(THREDDSViewer)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(THREDDSViewer)
 
     def retranslateUi(self, THREDDSViewer):
