@@ -19,6 +19,7 @@
 """
 
 import os
+import copy
 from PyQt4 import uic
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSlot,SIGNAL, Qt
@@ -31,6 +32,7 @@ from time import time
 from threading import RLock
 from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
 from THREDDSExplorer.libvisor.persistence import ServerDataPersistenceManager
+from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
@@ -166,10 +168,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
     def clearData(self):
         self.WMSBoundingBoxInfo.setText("No Bounding Box or CRS information available.")
-        self.WMS_eastLabel.setText("East: No information.\n")
-        self.WMS_westLabel.setText("West: No information.")
-        self.WMS_northLabel.setText("North: No information.")
-        self.WMS_southLabel.setText("South: No information.")
+        self.WMS_northBound.setText("East: No info")
+        self.WMS_southBound.setText("West: No info")
+        self.WMS_eastBound.setText("North: No info")
+        self.WMS_westBound.setText("South: No info")
         self.combo_wms_layer.clear()
         self.combo_wms_style_type.clear()
         self.combo_wms_style_palette.clear()
@@ -179,10 +181,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.combo_wcs_time.clear()
         self.combo_wcs_time_last.clear()
         self.WCSBoundingBoxInfo.setText("No Bounding Box or CRS information available." )
-        self.WCS_eastLabel.setText("East: No information.\n")
-        self.WCS_westLabel.setText("West: No information.\n")
-        self.WCS_northLabel.setText("North: No information.\n")
-        self.WCS_southLabel.setText("South: No information.\n")
+        self.WCS_northBound.setText("East: No info")
+        self.WCS_southBound.setText("West: No info")
+        self.WCS_eastBound.setText("North: No info")
+        self.WCS_westBound.setText("South: No info")
 
 
     #TODO: Unused (for now)
@@ -399,10 +401,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     BBinfo = coverageElement[0].getBoundingBoxInfo()
                     self.WCSBoundingBoxInfo.setText("CRS = "+BBinfo.getCRS()
                                                 +"\n\n Bounding Box information (decimal degrees):" )
-                    self.WCS_eastLabel.setText("East: \n"+BBinfo.getEast())
-                    self.WCS_westLabel.setText("West: \n"+BBinfo.getWest())
-                    self.WCS_northLabel.setText("North: \n"+BBinfo.getNorth())
-                    self.WCS_southLabel.setText("South: \n"+BBinfo.getSouth())
+                    self.WCS_eastBound.setText(BBinfo.getEast())
+                    self.WCS_westBound.setText(BBinfo.getWest())
+                    self.WCS_northBound.setText(BBinfo.getNorth())
+                    self.WCS_southBound.setText(BBinfo.getSouth())
                 except IndexError:
                     pass
 
@@ -427,10 +429,10 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                 BBinfo = layerSelectedObject[0].getBoundingBoxInfo()
                 self.WMSBoundingBoxInfo.setText("CRS = "+BBinfo.getCRS()
                                                 +"\n\n Bounding Box information (decimal degrees):" )
-                self.WMS_eastLabel.setText("East: \n"+BBinfo.getEast())
-                self.WMS_westLabel.setText("West: \n"+BBinfo.getWest())
-                self.WMS_northLabel.setText("North: \n"+BBinfo.getNorth())
-                self.WMS_southLabel.setText("South: \n"+BBinfo.getSouth())
+                self.WMS_eastBound.setText(BBinfo.getEast())
+                self.WMS_westBound.setText(BBinfo.getWest())
+                self.WMS_northBound.setText(BBinfo.getNorth())
+                self.WMS_southBound.setText(BBinfo.getSouth())
 
     @pyqtSlot(str)
     def _onWMSStyleTypeSelectorItemChanged(self, qstringitem):
@@ -463,10 +465,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         Action to be performed when the user clicks the
         button to request a new map to be displayed,
         after selecting proper values in the rest of fields.
-
-        This will also begin a qTimer which will check for
-        async messages which would report to us the availability
-        of a new image to be displayed.
         """
         #print(self.currentMap)
         self.postInformationMessageToUser("") #Reset error display.
@@ -474,12 +472,45 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
             try:
                 selectedBeginTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time.currentText())
                 selectedFinishTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time_last.currentText())+1
-                #print(str(self.currentMap))
-                self.controller.asyncFetchWCSImageFile(self.currentMap,
-                                                        self.combo_wcs_coverage.currentText(),
-                                                        self.wcsAvailableTimes[selectedBeginTimeIndex
-                                                                               :selectedFinishTimeIndex])
-            except Exception:
+                
+                #We retrieve some information about the current selected map, useful
+                #to grab the actual CRS used by the map service. Should be changed if
+                #CRS is to be user-selectable later via dropdown menu or anything like
+                #that.
+                if self.currentCoverages is not None:
+                    coverageElement = [ x for x in self.currentCoverages if x.getName()
+                                        == str(self.combo_wcs_coverage.currentText()) ]
+                if None is not coverageElement or len(coverageElement) > 0:
+                    try:
+                        try:
+                            north = float(self.WCS_northBound.text())
+                            south = float(self.WCS_southBound.text())
+                            east = float(self.WCS_eastBound.text())
+                            west = float(self.WCS_westBound.text())
+                        except ValueError:
+                            self.postCriticalErrorToUser("Bounding box values were not valid."
+                            +"\nCheck only decimal numbers are used\n(example: 12.44)")
+                            return
+                        #We retrieve the bounding box CRS information from the
+                        #requested coverage, and get the actual box values
+                        #from the UI.
+                        BBinfo = coverageElement[0].getBoundingBoxInfo()
+                        boundingBoxToDownload = BoundingBox()
+                        boundingBoxToDownload.setCRS(BBinfo.getCRS())
+                        boundingBoxToDownload.setEast(east)
+                        boundingBoxToDownload.setWest(west)
+                        boundingBoxToDownload.setNorth(north)
+                        boundingBoxToDownload.setSouth(south)
+                        self.controller.asyncFetchWCSImageFile(
+                                                   self.currentMap,
+                                                   self.combo_wcs_coverage.currentText(),
+                                                   self.wcsAvailableTimes[selectedBeginTimeIndex
+                                                                          :selectedFinishTimeIndex],
+                                                   boundingBox = boundingBoxToDownload)
+                    except IndexError:
+                        pass
+            except Exception as exc:
+                print(exc)
                 self.postInformationMessageToUser("There was an error retrieving the WCS data.")
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WMS):
             try:

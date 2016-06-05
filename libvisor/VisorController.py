@@ -308,7 +308,8 @@ class VisorController(QObject):
     ###WCS retrieval related operations###
     ###                                ###    
         
-    def asyncFetchWCSImageFile(self, threddsMapObject, coverageName, timeRangeRequested):
+    def asyncFetchWCSImageFile(self, threddsMapObject, coverageName,
+                                timeRangeRequested, boundingBox):
         """
         Will perform an async request for the layer to the WCS server,
         and return it to the calling object through the WCSProcessdone
@@ -323,31 +324,34 @@ class VisorController(QObject):
         :param timeRangeRequested:  time dimension of the maps to be retrieved
         :type timeRangeRequested:   [str]
         
+        :param boundingBox: Bounding box extent to be requested
+        :type  boundingBox: BoundingBox
+        
         :returns: QGIS Raster Layer object through WCSProcessdone QtSignal.
         :rtype: QgsRasterLayer
         """
-        #print("A time!")
         if timeRangeRequested is None or len(timeRangeRequested) ==0:
             #print("0 time!")
             threading.Thread(target = self._retrieveWCSMapImage,
-             args=(threddsMapObject,coverageName,"")).start()
+             args=(threddsMapObject,coverageName,"", boundingBox)).start()
         elif len(timeRangeRequested) == 1:
-            #print("1 time!")
             threading.Thread(target = self._retrieveWCSMapImage,
-             args=(threddsMapObject,coverageName,timeRangeRequested[0])).start()
+             args=(threddsMapObject,coverageName,timeRangeRequested[0], boundingBox)).start()
         else:
             self.standardMessage.emit("Downloading maps, please wait...")
             wcsBatchWorkerThread = WCSDownloadWorkerThread(
                        threddsMapObject.getWCS().getCapabilitiesURL(),
                        timeRangeRequested,
                        coverageName,
+                       boundingBox = boundingBox,
                        jobName = threddsMapObject.getName()+"_"+coverageName)
             thread = threading.Thread(target = wcsBatchWorkerThread.run)
             wcsBatchWorkerThread.WCSProcessdone.connect(self.BatchWorkerThreadDone)
             thread.start()
             
          
-    def _retrieveWCSMapImage(self, threddsMapObject, coverageName, timeRequested):
+    def _retrieveWCSMapImage(self, threddsMapObject, coverageName,
+                              timeRequested, bbox):
         """
         Async call to retrieve the image from server.
         Potentially long-running operation to be done
@@ -360,7 +364,10 @@ class VisorController(QObject):
         if threddsMapObject is not None and threddsMapObject.getWCS() is not None: 
             self.standardMessage.emit("Downloading '"+coverageName+"' [WCS], please wait...")
             lectorWCS = WCS.WCSparser(threddsMapObject.getWCS().getCapabilitiesURL())
-            resultImage = (lectorWCS.generateLayer(coverageName, timeRequested),coverageName, "WCS")
+            resultImage = (lectorWCS.generateLayer(coverageName,
+                                                   timeRequested,
+                                                   boundingBox = bbox),
+                           coverageName, "WCS")
             self.mapImageRetrieved.emit(resultImage)
         
             

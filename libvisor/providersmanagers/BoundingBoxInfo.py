@@ -13,6 +13,12 @@ class BoundingBox(object):
         self.data["west"] = None
         self.data["crs"] = None
         
+    def __str__(self):
+        return str(self.getWest())+","\
+            +str(self.getSouth())+","\
+            +str(self.getEast())+","\
+            +str(self.getNorth())
+        
     def setNorth(self, northBound):
         self.data["north"] = northBound
         
