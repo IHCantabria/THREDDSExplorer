@@ -64,8 +64,8 @@ class WMSparser(QObject):
                         '&dpiMode=7'
                         '&WIDTH=2048&HEIGHT=2048'
                         '&layers={layer}'
-                        '&BBOX={bbox}'
-                        '&TIME={time}' )
+                        '&TIME={time}'
+                        '&BBOX={bbox}' )
         XML = urllib2.urlopen(urlXML).read()
         self.tree = ET.fromstring(XML)
         self.mapInfo = None
@@ -135,7 +135,8 @@ class WMSparser(QObject):
             
             self.mapInfo.addLayer(layerObject)
         
-    def createMapLayer(self, mapLayerName, layerStyleName, layerTime="", minMaxRange=None):
+    def createMapLayer(self, mapLayerName, layerStyleName, boundingBox, layerTime="",
+                       minMaxRange=None):
         """
         Will create a QGIS valid raster layer for the
         parsed map, using the passed parameters to get the
@@ -170,7 +171,8 @@ class WMSparser(QObject):
             self.getMapInfoFromCapabilities()
             
         if minMaxRange == None:
-            minMaxRange = self.getMinMaxRasterValuesFromTimeRange(mapLayerName, layerStyleName, [layerTime])
+            minMaxRange = self.getMinMaxRasterValuesFromTimeRange(
+                                  mapLayerName, layerStyleName, [layerTime], boundingBox)
             
         rasterMinMaxValues = str(minMaxRange[0])+","+str(minMaxRange[1])
         #print("Raster range for "+mapLayerName+"_"+layerStyleName+": "+rasterMinMaxValues)
@@ -178,20 +180,24 @@ class WMSparser(QObject):
         finalUrl = self.baseWMSUrl.format(layer=mapLayerName, 
                         style=layerStyleName,
                         url=self.mapInfo.getURL())
-        
         #We add an UUID to guarantee uniqueness in the layer name and id
         layerName = self.mapInfo.getName()+"-"+str(uuid.uuid4())
         resultLayer = QgsRasterLayer(finalUrl, layerName, 'wms')
         
         #HACK taken from Anita Graser's Time Manager:
         #https://github.com/anitagraser/TimeManager/blob/master/raster/wmstlayer.py
-        #(Under GPL2 license) with an extra added for COLORSCALERANGE ncWMS attribute.
+        #(Under GPL2 license) with an extra added for COLORSCALERANGE ncWMS attribute
+        #and BOUNDINGBOX information (which is removed when constructing layers by qgis
+        #it seems?)
+        #TODO: Bounding box information is not processed by QGIS. QGIS C++ WMS provider
+        #apparently re-creates the request with a previously read bounding box information
+        #from the capabilities.xml file. This needs a workaround, or reature request to QGIS.
         resultLayer.dataProvider().setDataSourceUri(self.qgisWMSThack
                                                     + resultLayer.dataProvider().dataSourceUri() 
-                                                    + "?TIME={time}%26COLORSCALERANGE={scale}"
-                                                        .format(time = layerTime, scale=rasterMinMaxValues))
-        
-
+                                                    + "?TIME={time}%26COLORSCALERANGE={scale}%26BBOX={bbox}"
+                                                        .format(time = layerTime,
+                                                                scale=rasterMinMaxValues,
+                                                                bbox=str(boundingBox)))
         
         if resultLayer.isValid():
             self.mapLayer = resultLayer
@@ -214,7 +220,8 @@ class WMSparser(QObject):
         """
         return self.mapLayer;
     
-    def getMinMaxRasterValuesFromTimeRange(self, mapLayerName, layerStyleName, listOfTimes):
+    def getMinMaxRasterValuesFromTimeRange(self, mapLayerName, layerStyleName,
+                                            listOfTimes, boundingBox):
         """
         Returns a tuple of the (minimum, maximum) values for
         this raster. Useful if we want to create a coherent
@@ -225,9 +232,6 @@ class WMSparser(QObject):
         #request to find the min/max range values for the raster.
         if self.mapInfo == None:
             self.getMapInfoFromCapabilities()
-            
-        boundingBoxData = ([x.getBoundingBoxInfo() for x in self.mapInfo.getLayers() 
-                                if x.getName() == mapLayerName])[0]
                                
         threads = []
          
@@ -239,8 +243,7 @@ class WMSparser(QObject):
             pathForJSON = self.WMSValueRangeCheckURL.format(
                           layer=mapLayerName,
                           style=layerStyleName,
-                          bbox=boundingBoxData.getWest()+','+boundingBoxData.getSouth()
-                                +','+boundingBoxData.getEast()+','+boundingBoxData.getNorth(),
+                          bbox=str(boundingBox),
                           time = moment)
             thread = threading.Thread(target = self._getRangeValuesFromJSONPath, args=(pathForJSON,))
             threads.append(thread)

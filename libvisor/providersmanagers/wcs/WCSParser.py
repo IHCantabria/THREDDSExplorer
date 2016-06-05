@@ -65,7 +65,8 @@ class WCSparser(object):
 		                            + '&request=GetCoverage'
 		                            + '&coverage={coverageName}'
 		                            + '&TIME={timeCode}'
-		                            + '&format=GeoTIFF')
+		                            + '&format=GeoTIFF'
+		                            + '&BBOX={BBOX}')
 	
 	def getAvailableCoverages(self):
 		"""
@@ -82,7 +83,7 @@ class WCSparser(object):
 			
 		return self.availableCoverages
 	
-	def generateURLForGeoTIFF(self, nameCoverage, coverageTime):
+	def generateURLForGeoTIFF(self, nameCoverage, coverageTime, boundingBox):
 		"""
 		Generates a direct download URL for a GeoTiff formatted image
 		for the map cached in this object, using the coverage and
@@ -101,10 +102,11 @@ class WCSparser(object):
         :rtype: 	str
 		"""
 		return self.urlGetCoverage.format(coverageName = nameCoverage, 
-		    timeCode = coverageTime)
+		    timeCode = coverageTime,
+		    BBOX = str(boundingBox))
 		
 		
-	def generateLayer(self, nameCoverage, coverageTime):
+	def generateLayer(self, nameCoverage, coverageTime, boundingBox = None):
 		"""
 		Generates a raster layer for QGIS. 
 		
@@ -119,8 +121,7 @@ class WCSparser(object):
 		            times provided.
 		:rtype:     QgsRasterLayer
 		"""
-		url = self.generateURLForGeoTIFF(nameCoverage , coverageTime)
-		
+		url = self.generateURLForGeoTIFF(nameCoverage, coverageTime, boundingBox)
 		layerName = coverageTime+"_"+nameCoverage+"-"+str(uuid.uuid4())
 		layer = QgsRasterLayer(url, layerName)
 		

@@ -126,31 +126,38 @@
               </item>
               <item>
                <layout class="QGridLayout" name="WMS_Bounds">
-                <item row="1" column="0">
-                 <widget class="QLabel" name="WMS_westLabel">
-                  <property name="text">
-                   <string>West Bound</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
+                <item row="1" column="1">
                  <widget class="QLabel" name="WMS_northLabel">
                   <property name="text">
-                   <string>North Bound</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QLabel" name="WMS_eastLabel">
-                  <property name="text">
-                   <string>East Bound</string>
+                 <widget class="QLineEdit" name="WMS_eastBound">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLineEdit" name="WMS_westBound">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QLabel" name="WMS_southLabel">
-                  <property name="text">
-                   <string>South Bound</string>
+                 <widget class="QLineEdit" name="WMS_southBound">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="WMS_northBound">
+                  <property name="enabled">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -207,33 +214,17 @@
               </item>
               <item>
                <layout class="QGridLayout" name="WCS_Bounds">
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="WCS_southBound"/>
+                </item>
                 <item row="0" column="1">
-                 <widget class="QLabel" name="WCS_northLabel">
-                  <property name="text">
-                   <string>North Bound</string>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="WCS_northBound"/>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QLabel" name="WCS_westLabel">
-                  <property name="text">
-                   <string>West Bound</string>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="WCS_westBound"/>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QLabel" name="WCS_eastLabel">
-                  <property name="text">
-                   <string>East Bound</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLabel" name="WCS_southLabel">
-                  <property name="text">
-                   <string>South Bound</string>
-                  </property>
-                 </widget>
+                 <widget class="QLineEdit" name="WCS_eastBound"/>
                 </item>
                </layout>
               </item>

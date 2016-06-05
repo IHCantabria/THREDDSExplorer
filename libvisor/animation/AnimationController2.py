@@ -322,6 +322,7 @@ class Controller(QObject):
             worker = WCSDownloadWorkerThread(item.getMapObject().getWCS().getCapabilitiesURL(),
                                  item.getTimes(),
                                  item.getLayerName(),
+                                 item.getBBOX(),
                                  parent = self) 
             
             baseLayerDictionary = worker.getLayerDict() 
