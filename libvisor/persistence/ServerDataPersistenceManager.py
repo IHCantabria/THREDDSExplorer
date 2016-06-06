@@ -56,7 +56,7 @@ class ServerStorageManager(QDialog):
         self.serverListDialog.buttonAdd.clicked.connect(self._onbuttonAddClick)
         self.serverListDialog.buttonRemove.clicked.connect(self._onbuttonDeleteClick)
         self.reloadTable()
-        super(ServerStorageManager, self).show()
+        #super(ServerStorageManager, self).show()
 
     def reloadTable(self):
         """Synchronizes the copy of the available servers this object

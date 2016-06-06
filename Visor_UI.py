@@ -19,6 +19,7 @@
 """
 
 import os
+import sys
 from threading import RLock
 
 from PyQt4 import uic
@@ -65,13 +66,19 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.controller.mapInfoRetrieved.connect(self._onMapInfoReceivedFromController)
         self.controller.batchDownloadFinished.connect(self.createLayerGroup)
 
-        self.showEmptyDatasetNodes = showEmptyDatasetNodes #TODO: Self-explanatory...
+        self.showEmptyDatasetNodes = showEmptyDatasetNodes # TODO: self-explanatory...
         self.combo_dataset_list.currentIndexChanged.connect(self._onDataSetItemChanged)
         self.tree_widget.itemClicked.connect(self._onMapTreeWidgetItemClicked)
         self.tree_widget.itemExpanded.connect(self._onMapTreeWidgetItemExpanded)
-        self.connect(self.combo_wcs_coverage, SIGNAL("currentIndexChanged(const QString&)"), self._onCoverageSelectorItemChanged)
-        self.connect(self.combo_wms_layer, SIGNAL("currentIndexChanged(const QString&)"), self._onWMSLayerSelectorItemChanged)
-        self.connect(self.combo_wms_style_type, SIGNAL("currentIndexChanged(const QString&)"), self._onWMSStyleTypeSelectorItemChanged)
+
+        self.tabWidget.currentChanged.connect(self.runWhenTabChange)
+
+        self.connect(self.combo_wcs_coverage, SIGNAL("currentIndexChanged(const QString&)"),
+                self._onCoverageSelectorItemChanged)
+        self.connect(self.combo_wms_layer, SIGNAL("currentIndexChanged(const QString&)"),
+                self._onWMSLayerSelectorItemChanged)
+        self.connect(self.combo_wms_style_type, SIGNAL("currentIndexChanged(const QString&)"),
+                self._onWMSStyleTypeSelectorItemChanged)
         self.connect(self.combo_wms_time, SIGNAL("currentIndexChanged(int)"), self._onWMSFirstTimeChanged)
         self.connect(self.combo_wcs_time, SIGNAL("currentIndexChanged(int)"), self._onWCSFirstTimeChanged)
 
@@ -80,7 +87,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.buttonManageServers.clicked.connect(self._onManageServersRequested)
         self.button_req_animation.clicked.connect(self.toggleAnimationMenu)
 
-        #We add a status bar to this QDockWidget
+        # We add a status bar to this QDockWidget:
         self.statusbar = QStatusBar()
         self.gridLayout.addWidget(self.statusbar)
 
@@ -115,36 +122,58 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         when the user opens the plug-in for first time (be advised this
         is not the same as the first time the plug-in object is created,
         which is on QGIS load)."""
+        pass
 
-        # Check GDAL version. Versions < 2.0 had a bug regarding
-        # driver selection for network resource retrieval.
-        # (https://trac.osgeo.org/gdal/ticket/2696)
+    def runWhenTabChange(self):
+        """Convenience method to add any actions to be performed at tab change."""
+
+        # Show warning for GDAL version, if needed.
+        self.checkGdalWindowWarning()
+
+    def checkGdalWindowWarning(self):
+        """Method to show GDAL version warning if need be."""
+
+        # If OS is linux:
+        if sys.platform.startswith('linux'):
+            # Show warning only if WCS tab selected:
+            if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WCS):
+                self.createGDALWindowWarning()
+
+    def createGDALWindowWarning(self):
+        """Check GDAL version. Versions < 2.0 had a bug regarding driver selection
+        for network resource retrieval (https://trac.osgeo.org/gdal/ticket/2696)."""
+
         persistenceManager = ServerDataPersistenceManager.ServerStorageManager()
-        reply = 0
+
         if persistenceManager.show_GDAL_error:
             try:
                 from osgeo import gdal
                 if int(gdal.VersionInfo()) < 2000000:
-
-                    message = ("Your GDAL libraries version is outdated. Versions\n"
-                            +"under 2.0 are not guaranteed to work when\n"
-                            +"attempting to load WCS Layers.\n"
-                            +"Please update GDAL.")
+                    # Show warning window, and allow for "don't show again":
+                    message  = "Your GDAL libraries version is outdated. Versions\n"
+                    message += "under 2.0 are not guaranteed to work when\n"
+                    message += "attempting to load WCS Layers.\nPlease update GDAL."
 
                     reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
-                            message, "Close", "Don't show again")
+                            (message), "Close", "Don't show again")
+
+                    # If requested to, record setting not to show warning again:
+                    if reply == 1:
+                        persistenceManager.show_GDAL_error = False
 
             except ImportError:
-                message = ("Your GDAL libraries version could not be read"
-                        +"Versions under 2.0 are not guaranteed to work when\n"
-                        +"attempting to load WCS Layers. If you have any issues,\n"
-                        +"please update GDAL.")
+                # Show warning window, and allow for "don't show again":
+                message  = "Your GDAL libraries version could not be read"
+                message += "Versions under 2.0 are not guaranteed to work when\n"
+                message += "attempting to load WCS Layers. If you have any issues,\n"
+                message += "please update GDAL."
 
                 reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
-                        message, "Close", "Don't show again")
+                        (message), "Close", "Don't show again")
 
-            if reply == 1:
-                persistenceManager.show_GDAL_error = False
+                # If requested to, record setting not to show warning again:
+                if reply == 1:
+                    persistenceManager.show_GDAL_error = False
 
     def toggleAnimationMenu(self):
         """Shows (or hides) the animation menu elements,
