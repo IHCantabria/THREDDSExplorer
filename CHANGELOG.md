@@ -1,4 +1,6 @@
 **CURRENT**
+* ServerDataPersistenceManager.py
+    - solved bug when reading variable "GDALVersionErrorSetting" (2016.06.06)
 
 **v1.0** (2016-05-31)
 

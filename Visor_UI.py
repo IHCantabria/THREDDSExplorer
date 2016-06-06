@@ -19,21 +19,22 @@
 """
 
 import os
+from threading import RLock
+
 from PyQt4 import uic
 from PyQt4 import QtGui
 from PyQt4.QtCore import pyqtSlot,SIGNAL, Qt
-from THREDDSExplorer.libvisor import VisorController
-from qgis.core import QgsMapLayerRegistry, QgsProject, QgsRectangle, QgsLayerTreeLayer, QgsLayerTreeGroup
-from qgis.utils import iface
 from PyQt4.QtGui import QMessageBox, QStatusBar
-from THREDDSExplorer.libvisor.animation.AnimationFrame import AnimationFrame
-from time import time
-from threading import RLock
-from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
-from THREDDSExplorer.libvisor.persistence import ServerDataPersistenceManager
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
+from qgis.utils import iface
+from qgis.core import QgsLayerTreeGroup, QgsMapLayerRegistry
+
+from THREDDSExplorer.libvisor import VisorController
+from THREDDSExplorer.libvisor.animation.AnimationFrame import AnimationFrame
+from THREDDSExplorer.libvisor.persistence import ServerDataPersistenceManager
+from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
 
 class Visor(QtGui.QDockWidget, FORM_CLASS):
     """
@@ -46,9 +47,12 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
     options to download maps through WMS and WCS services using a
     controller and show them in QGIS.
     """
+
     groupAssignmentLock = RLock()
 
     def __init__(self, showEmptyDatasetNodes = False, parent=None):
+        """Constructor."""
+
         super(Visor, self).__init__(parent)
         self.setupUi(self)
 
@@ -91,63 +95,65 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
     def show(self):
         if iface and not iface.mainWindow().restoreDockWidget(self):
             iface.mainWindow().addDockWidget(Qt.LeftDockWidgetArea, self)
+
         super(Visor, self).show()
 
-        if self.firstRunThisSession is True:
+        if self.firstRunThisSession:
             self.firstRunChecks()
             self.firstRunThisSession = False
 
-        #If no dataset is selected yet, we will assume the first
-        #thing the user will want to do is actually doing something
-        #related to the servers (pick one from a list, or add a new
-        #one) as there is little else that can be done at this point.
-        #So we present them the screen to do so..
+        # If no dataset is selected yet, we will assume the first
+        # thing the user will want to do is actually doing something
+        # related to the servers (pick one from a list, or add a new
+        # one) as there is little else that can be done at this point.
+        # So we present them the screen to do so...
         if self.datasetInUse is None:
             self._onManageServersRequested()
 
     def firstRunChecks(self):
-        """
-        Convenience method to add any checks which should be performed
+        """Convenience method to add any checks which should be performed
         when the user opens the plug-in for first time (be advised this
         is not the same as the first time the plug-in object is created,
-        which is on QGIS load).
-        """
-        #Check GDAL version. Versions < 2.0 had a bug regarding
-        #driver selection for network resource retrieval.
-        #https://trac.osgeo.org/gdal/ticket/2696
+        which is on QGIS load)."""
+
+        # Check GDAL version. Versions < 2.0 had a bug regarding
+        # driver selection for network resource retrieval.
+        # (https://trac.osgeo.org/gdal/ticket/2696)
         persistenceManager = ServerDataPersistenceManager.ServerStorageManager()
-        if persistenceManager.getDontShowGDALErrorAnymore() is False:
+        reply = 0
+        if persistenceManager.show_GDAL_error:
             try:
-    
                 from osgeo import gdal
                 if int(gdal.VersionInfo()) < 2000000:
-    
+
                     message = ("Your GDAL libraries version is outdated. Versions\n"
-                                                  +"under 2.0 are not guaranteed to work when\n"
-                                                  +"attempting to load WCS Layers.\n"
-                                                  +"Please update GDAL.")
+                            +"under 2.0 are not guaranteed to work when\n"
+                            +"attempting to load WCS Layers.\n"
+                            +"Please update GDAL.")
+
+                    reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
+                            message, "Close", "Don't show again")
+
             except ImportError:
                 message = ("Your GDAL libraries version could not be read"
-                                                  +"Versions under 2.0 are not guaranteed to work when\n"
-                                                  +"attempting to load WCS Layers. If you have any issues,\n"
-                                                  +"please update GDAL.")
-    
-            reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
-                     message, "Close", "Don't show again")
-    
-            if reply == 1:
-                persistenceManager.setDontShowGDALErrorAnymore()
+                        +"Versions under 2.0 are not guaranteed to work when\n"
+                        +"attempting to load WCS Layers. If you have any issues,\n"
+                        +"please update GDAL.")
 
+                reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
+                        message, "Close", "Don't show again")
+
+            if reply == 1:
+                persistenceManager.show_GDAL_error = False
 
     def toggleAnimationMenu(self):
-        """
-        Shows (or hides) the animation menu elements,
+        """Shows (or hides) the animation menu elements,
         and instantiate a controller.
 
         It seems I can not directly hide elements,
         but I can make another Widget in QDesigner and
-        create/add it to a layout here so... oh well..
-        """
+        create/add it to a layout here so... oh well..."""
+
         if self.uiAnimation is None:
             self.uiAnimation = AnimationFrame(parent = self)
             self.uiAnimation.errorSignal.connect(self.postCriticalErrorToUser)
@@ -162,7 +168,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
             self.uiAnimation.hide()
             self.uiAnimation = None
             self.button_req_animation.setText("Show animation menu >>")
-
 
     def clearData(self):
         self.WMSBoundingBoxInfo.setText("No Bounding Box or CRS information available.")
@@ -184,17 +189,13 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.WCS_northLabel.setText("North: No information.\n")
         self.WCS_southLabel.setText("South: No information.\n")
 
-
-    #TODO: Unused (for now)
+    # TODO: Unused (for now)
     @pyqtSlot(bool)
     def _onAlwaysOnTopPrefsChanged(self, newSettingBool):
-        """
-        Will change the alwaysontop window modifier to suit
-        the user selection.
-        """
+        """Will change the alwaysontop window modifier to suit the user selection."""
+
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
         QtGui.QMainWindow.show(self)
-
 
     @pyqtSlot(list, str)
     def onNewDatasetsAvailable(self, inDataSets, serverName):
@@ -220,7 +221,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.postInformationMessageToUser("Dataset list updated: "+str(len(StringList))+ " elements.")
         self.clearData()
 
-
     @pyqtSlot(str)
     def postInformationMessageToUser(self, message):
         """
@@ -230,8 +230,8 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                             the user.
         :type message: str
         """
+
         self.statusbar.showMessage(message)
-        pass
 
     @pyqtSlot(str)
     def postCriticalErrorToUser(self, errorString):
@@ -243,18 +243,17 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                             the user.
         :type  errorString: str
         """
+
         box = QMessageBox()
         box.setText(errorString)
         box.setIcon(QMessageBox.Critical)
         box.exec_()
 
-
     @pyqtSlot(str)
     def _onDataSetItemChanged(self, stringItem):
-        """
-        Will receive notifications about this window dataSet
-        chosen combobox when the item selected changes.
-        """
+        """Will receive notifications about this window dataSet
+        chosen combobox when the item selected changes."""
+
         self.tree_widget.clear()
         self.datasetInUse = self.controller.getSingleDataset(self.combo_dataset_list.currentText())
         if self.datasetInUse is None:
@@ -264,10 +263,8 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         newItem = QtGui.QTreeWidgetItem(rootItem, [self.datasetInUse.getName()])
         rootItem.addChild(self._createHierarchy(self.datasetInUse, newItem))
 
-
     def _createHierarchy(self, dataSet, treeItemParent):
-        """
-        Recursively creates a hierarchy of elements to populate
+        """Recursively creates a hierarchy of elements to populate
         a treeWidgetItem from a given dataSet.
 
         :param dataSet: DataSet object to create an hierarchy from.
@@ -275,8 +272,8 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
         :param treeItemParent: Item which will be this
                                 branch parent.
-        :type treeItemParent: QTreeWidgetItem
-        """
+        :type treeItemParent: QTreeWidgetItem"""
+
         i = 0
         itemsAlreadyAddedToElement = []
         while i < treeItemParent.childCount():
@@ -316,17 +313,13 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         else:
             self.postCriticalErrorToUser("WARNING: Attempted to add a null dataset to view.")
 
-
-
-
-
-
     def _onMapTreeWidgetItemClicked(self, mQTreeWidgetItem, column):
         """
         Will receive notifications about the MapTreeWidget
         elements being clicked, so we can update the first
         combobox of WMS/WCS tabs with the layer list.
         """
+
         self.clearData()
         self.postInformationMessageToUser("")
         if None is mQTreeWidgetItem or None is mQTreeWidgetItem.parent():
@@ -355,8 +348,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
             else:
                 self.combo_wms_layer.addItem("No data available.")
 
-
-
     def _onMapTreeWidgetItemExpanded(self, mQTreeWidgetItem):
         """
         Once a set is expanded in the tree view we will attempt to
@@ -367,8 +358,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         if setToUpdate is not None and len(setToUpdate) > 0:
             self.controller.mapDataSet(setToUpdate[0], depth=1)
 
-
-
     def onDataSetUpdated(self, dataSetObject):
         """
         Will update the QTreeWidget to include the updated
@@ -378,9 +367,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
             parent = self.tree_widget.findItems(dataSetObject.getName(), Qt.MatchRecursive)
         self._createHierarchy(dataSetObject, parent[0])
 
-
-
-
     @pyqtSlot(str)
     def _onCoverageSelectorItemChanged(self, QStringItem):
         """
@@ -389,6 +375,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         times to request to server are updated in the other
         combobox for the WCS service.
         """
+
         self.combo_wcs_time.clear()
         if self.currentCoverages is not None:
             coverageElement = [ x for x in self.currentCoverages if x.getName() == str(QStringItem) ]
@@ -412,7 +399,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.combo_wms_style_palette.clear()
         self.combo_wms_time.clear()
 
-        #Only one should be returned here.
+        # Only one should be returned here.
         if self.currentWMSMapInfo is not None:
             layerSelectedObject =  [ x for x in self.currentWMSMapInfo.getLayers()
                                     if x.getName() == str(QStringItem) ]
@@ -457,7 +444,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.combo_wms_time_last.addItems(
           self.wmsAvailableTimes[position:])
 
-
     def _onbuttonReqMapClicked(self):
         """
         Action to be performed when the user clicks the
@@ -468,13 +454,12 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         async messages which would report to us the availability
         of a new image to be displayed.
         """
-        #print(self.currentMap)
-        self.postInformationMessageToUser("") #Reset error display.
+
+        self.postInformationMessageToUser("") # reset error display.
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WCS):
             try:
                 selectedBeginTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time.currentText())
                 selectedFinishTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time_last.currentText())+1
-                #print(str(self.currentMap))
                 self.controller.asyncFetchWCSImageFile(self.currentMap,
                                                         self.combo_wcs_coverage.currentText(),
                                                         self.wcsAvailableTimes[selectedBeginTimeIndex
@@ -493,8 +478,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                                                                                :selectedFinishTimeIndex])
             except Exception:
                 self.postInformationMessageToUser("There was an error retrieving the WMS data.")
-
-
 
     @pyqtSlot(list, str)
     def createLayerGroup(self, layerList, groupName):
@@ -531,6 +514,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         :type image: (QgsRasterLayer, String, String)
 
         """
+
         self.postInformationMessageToUser("Layer '"+image[1]+"' ["+image[2]+"]retrieved")
         layer = image[0]
 
@@ -543,8 +527,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
     @pyqtSlot()
     def _onManageServersRequested(self):
-        """
-        Delegates the action of showing the server manager
-        window to the controller.
-        """
+        """Delegates the action of showing the server manager window to the controller."""
+
         self.controller.showServerManager()

@@ -1,18 +1,25 @@
 # -*- coding:utf8 -*-
-'''
-Created on 4 de ene. de 2016
+"""
+Created on 2016-01-04
 
 @author: IHC
-'''
-from THREDDSExplorer.libvisor.persistence.ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
-from PyQt4.QtCore import QSettings,  pyqtSignal, pyqtSlot
-from PyQt4.QtGui import QDialog, QTableWidgetItem, QAbstractItemView, QMessageBox,\
-    QDockWidget
+"""
+
+from PyQt4.QtGui import QDialog
+from PyQt4.QtGui import QMessageBox
+from PyQt4.QtGui import QTableWidgetItem
+from PyQt4.QtGui import QAbstractItemView
+
+from PyQt4.QtCore import pyqtSlot
+from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import pyqtSignal
+
 import THREDDSExplorer.libvisor.persistence.Server_Manager_UI as ManagerUI
 from THREDDSExplorer.libvisor.persistence.AddServerWindowManager import AddServerWindowManager as addServerManager
+from THREDDSExplorer.libvisor.persistence.ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
 
 class ServerStorageManager(QDialog):
-    '''
+    """
     Handles persistence of preferences for this application,
     using QGIS settings storage API. Will also handle
     user interaction with the persisted objects.
@@ -28,19 +35,18 @@ class ServerStorageManager(QDialog):
     configuration options across different modules created
     by IH (like publishing modules capabilities for animators,
     loaders, ... to be later read and executed by others)
-    '''
+    """
     serverSelected = pyqtSignal(ThreddsServerInfoObject)
 
     def __init__(self, parent = None):
-        '''
-        Constructor
-        '''
+        """Constructor."""
+
         super(ServerStorageManager, self).__init__(parent)
         self.IHDomain = "IHCANTABRIA"
         self.PluginDomain = "THREDDS_EXPLORER"
-        self.ThreddsServerGroup = self.IHDomain+"/"+self.PluginDomain+"/servers"
-        self.SettingsGroup = self.IHDomain+"/"+self.PluginDomain+"/settings"
-        self.GDALVersionErrorSetting = self.SettingsGroup+"/gdalerrorshowagain"
+        self.ThreddsServerGroup = "/".join([self.IHDomain, self.PluginDomain, "servers"])
+        self.SettingsGroup = "/".join([self.IHDomain, self.PluginDomain, "settings"])
+        self.GDALVersionErrorSetting = "/".join([self.SettingsGroup, "show_gdal_error"])
         self.availableServers = []
         self.initializeDefaultServers()
 
@@ -53,11 +59,10 @@ class ServerStorageManager(QDialog):
         super(ServerStorageManager, self).show()
 
     def reloadTable(self):
-        """
-        Synchronizes the copy of the available servers this object
+        """Synchronizes the copy of the available servers this object
         holds with the ones stored in the Settings, and updates the
-        table to show changes.
-        """
+        table to show changes."""
+
         self.availableServers = self.retrieveAllStoredServerInfo()
         table = self.serverListDialog.tableWidget
         #table.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -110,7 +115,6 @@ class ServerStorageManager(QDialog):
         for srv in defaultServers:
             self._saveServerInSettings(srv)
 
-
     def _saveServerInSettings(self, serverInfoObject):
         """
         Stores an object containing the required information to access a thredds
@@ -150,8 +154,6 @@ class ServerStorageManager(QDialog):
         settings.endGroup()
         return serverList
 
-
-
     def _onbuttonLoadDataClick(self):
         selectedRowNumber = self.serverListDialog.tableWidget.currentRow()
 
@@ -159,7 +161,6 @@ class ServerStorageManager(QDialog):
         #the server list table and the internal server list.
         if selectedRowNumber >= 0 and selectedRowNumber < len(self.availableServers):
             self.serverSelected.emit(self.availableServers[selectedRowNumber])
-
 
     def _onbuttonAddClick(self):
         self.addServerWindowManager = addServerManager()
@@ -184,19 +185,19 @@ class ServerStorageManager(QDialog):
 
     @pyqtSlot(tuple)
     def _onAttemptToAddNewServer(self, inServerDetails):
-        """
-        Checks if the server details provided are valid (or seem to be so) and
-        then adds them to the underlying storage system. Will hide the add server
-        window or show an error message depending on the outcome of this operation.
-        """
+        """Checks whether the server details provided are valid (or seem to be so)
+        and then adds them to the underlying storage system. Will hide the add server
+        window or show an error message depending on the outcome of this operation."""
+
         if isValidName(inServerDetails[0]) is False:
-            QMessageBox.warning(self,
-                            "Warning",
-                            "The provided name is not valid.\nMake sure it is not empty, and doesn't have any slashes ('/') in it.")
+            msg  = "The provided name is not valid.\n"
+            msg += "Make sure it is not empty, and doesn't have any slashes ('/') in it."
+            QMessageBox.warning(self, "Warning", msg)
+
         elif isValidURL(inServerDetails[1]) is False:
-            QMessageBox.warning(self,
-                            "Warning",
-                            "The provided URL is not valid.\nMake sure it is not empty.")
+            msg = "The provided URL is not valid.\nMake sure it is not empty."
+            QMessageBox.warning(self, "Warning", msg)
+
         else:
             serverInfo = ThreddsServerInfoObject(inServerDetails[0], inServerDetails[1])
             self._saveServerInSettings(serverInfo)
@@ -204,11 +205,32 @@ class ServerStorageManager(QDialog):
             self.addServerWindowManager = None
             self.reloadTable()
 
+    @property
+    def show_GDAL_error(self):
+        """Return whether or not to show GDAL error.
+        Default is True."""
 
-    def setDontShowGDALErrorAnymore(self):
         settings = QSettings()
-        settings.setValue(self.GDALVersionErrorSetting, True)
+        ret = settings.value(self.GDALVersionErrorSetting, True)
 
-    def getDontShowGDALErrorAnymore(self):
+        if type(ret) == bool:
+            return ret
+
+        elif type(ret) in [ str, unicode ]:
+            ret = ret.lower()
+            if ret == "true":
+                return True
+            else:
+                return False
+
+        else:
+            # Default:
+            return True
+
+    @show_GDAL_error.setter
+    def show_GDAL_error(self, val):
+        """Set True/False to settings var of whether or not show GDAL error anymore.
+        False means do not show error ever again."""
+
         settings = QSettings()
-        return settings.value(self.GDALVersionErrorSetting, False)
+        settings.setValue(self.GDALVersionErrorSetting, val)
