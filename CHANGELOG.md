@@ -4,9 +4,13 @@
 * Visor_UI.py
     - Moved GDAL version warning to WCS tab for Linux users
 * ServerDataPersistenceManager.py
-    - Do not show server list window on __init__ method 
+    - Do not show server list window on __init__ method
 * VisorController.py
-    - Show server list window when button is clicked   
+    - Show server list window when button is clicked
+
+    
+* General
+  - Trace errors into QGIS/THREDDSExplorer registry tab
 
 **v1.0** (2016-05-31)
 
