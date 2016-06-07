@@ -34,6 +34,8 @@ from THREDDSExplorer.libvisor import VisorController
 from THREDDSExplorer.libvisor.animation.AnimationFrame import AnimationFrame
 from THREDDSExplorer.libvisor.persistence import ServerDataPersistenceManager
 from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
+from qgis.core import QgsMessageLog
+import traceback
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
 
@@ -483,7 +485,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         async messages which would report to us the availability
         of a new image to be displayed.
         """
-
         self.postInformationMessageToUser("") # reset error display.
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WCS):
             try:
@@ -495,6 +496,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                                                                                :selectedFinishTimeIndex])
             except Exception:
                 self.postInformationMessageToUser("There was an error retrieving the WCS data.")
+                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WMS):
             try:
                 selectedBeginTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time.currentText())
@@ -507,6 +509,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                                                                                :selectedFinishTimeIndex])
             except Exception:
                 self.postInformationMessageToUser("There was an error retrieving the WMS data.")
+                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
 
     @pyqtSlot(list, str)
     def createLayerGroup(self, layerList, groupName):
@@ -546,7 +549,6 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
         self.postInformationMessageToUser("Layer '"+image[1]+"' ["+image[2]+"]retrieved")
         layer = image[0]
-
         if layer.isValid() is True:
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             iface.zoomToActiveLayer()

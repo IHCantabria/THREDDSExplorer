@@ -7,6 +7,8 @@ from THREDDSExplorer.libvisor.utilities.Utilities import combineURLS
 from PyQt4.QtCore import pyqtSignal, QObject
 from httplib import HTTPException
 from urllib2 import URLError
+from qgis.core import QgsMessageLog
+import traceback
 
 class Map(object):
     """
@@ -181,10 +183,6 @@ class DataSet(object):
 
         return resultado
 
-
-
-
-
 class ThreddsCatalogInfo(QObject):
     """
     Maps thredds-based data sets.
@@ -249,6 +247,7 @@ class ThreddsCatalogInfo(QObject):
             page = urllib2.urlopen(self.threddsMainCatalog+r'/'+self.threddsCatalogFileName,
                                 timeout=self.NetworkRequestTimeout)
         except (HTTPException, URLError, ValueError) as e:
+            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
             raise e
 
         string = page.read()
@@ -327,6 +326,7 @@ class ThreddsCatalogInfo(QObject):
         try:
             page = urllib2.urlopen(url, timeout=self.NetworkRequestTimeout)
         except Exception as e:
+            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
             raise e
 
         string = page.read()

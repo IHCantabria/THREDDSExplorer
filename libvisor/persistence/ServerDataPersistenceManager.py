@@ -106,8 +106,9 @@ class ServerStorageManager(QDialog):
         have previously been changed.
         """
         defaultServers = []
-        # settings.beginGroup(self.ThreddsServerGroup)
-        # for setting in settings.allKeys():
+        #settings = QSettings()
+        #settings.beginGroup(self.ThreddsServerGroup)
+        #for setting in settings.allKeys():
         #     settings.remove(setting)
         defaultServers.append(ThreddsServerInfoObject('NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'))
         defaultServers.append(ThreddsServerInfoObject('NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'))

@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'C:\Users\harol\Desktop\Eclipse Workspace\IH Public Projects\THREDDSExplorer\libvisor\animation\Animation_add_others.ui'
-#
 # Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -40,4 +37,3 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Add a new animation", None))
         self.progressInfoLabel.setText(_translate("Dialog", "TextLabel", None))
-
