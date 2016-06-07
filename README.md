@@ -14,7 +14,7 @@ This plug-in should work with most THREDDS servers, and will be able to retrieve
 
 Installing the plug-in basically involves copying the code in a QGIS "plugins" directory, as detailed below.
 
-Please note that it is mandatory that the folder where the code resides is called "THREDDSExplorer". If you download the code in ZIP format the default name ("THREDDSExplorer-master") must be changed to "THREDDSExplorer".
+Please note that it is mandatory that the folder where the code resides is called "THREDDSExplorer". If you download the code in ZIP format the default name ("THREDDSExplorer-$VERSION") must be changed to "THREDDSExplorer".
 
 ### For Windows
 
@@ -28,20 +28,23 @@ If you want to install the plug-in for all the users in the system, you should u
 
 ### For Linux
 
-This procedure works on Linux Mint 17.3, with QGIS 2.14 Essen. If you want to download the latest version of the code via git, and make it available for a single user:
+This procedure has been tested and works on Linux Mint 17.3 and Ubuntu 16.04 LTS, with QGIS 2.14 Essen. It is recommended that you download the latest tagged version (v1.0), via either git or a ZIP file. If you want to get the code in ZIP format:
+
+    $ mkdir ~/.qgis2/python/plugins
+    $ cd ~/.qgis2/python/plugins/
+    $ wget https://github.com/IHCantabria/THREDDSExplorer/archive/v1.0.zip
+    $ unzip THREDDSExplorer-1.0.zip
+    $ mv THREDDSExplorer-1.0 THREDDSExplorer
+    $ rm THREDDSExplorer-v1.0.zip
+
+If you want to download the code via git:
 
     $ mkdir ~/.qgis2/python/plugins
     $ cd ~/.qgis2/python/plugins/
     $ git clone https://github.com/IHCantabria/THREDDSExplorer.git
+    $ git checkout -b v1.0
 
-If you want to download a ZIP, you can also do so:
-
-    $ mkdir ~/.qgis2/python/plugins
-    $ cd ~/.qgis2/python/plugins/
-    $ wget https://github.com/IHCantabria/THREDDSExplorer/archive/master.zip
-    $ unzip master.zip
-    $ mv THREDDSExplorer-master THREDDSExplorer
-    $ rm master.zip
+The last step (the checkout) will make the v1.0 tag active. If you skip it you will have whatever is the latest code in the repository, instead of a tagged version (not recommended).
 
 If you want to install the plug-in system-wide (for all the users), you can substitute the directory in the examples above with `/share/qgis/python/plugins/`. In that case, you will have to use sudo or be root to `mkdir` the plugins folder, and download content to it.
 
