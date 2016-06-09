@@ -16,6 +16,10 @@
     - Show server list window when button is clicked
 
 
+* THREDDS_Explorer_dockwidget_base.ui, THREDDS_Explorer_dockwidget.py
+    - Add vertical and horizontal scrolls to the plugin's main user interface
+
+    
 * General
   - Trace errors into QGIS/THREDDSExplorer registry tab
 
