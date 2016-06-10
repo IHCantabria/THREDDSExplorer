@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Fri Jun 10 13:27:53 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -39,5 +40,3 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(_translate("Dialog", "Add a new animation", None))
         self.progressInfoLabel.setText(_translate("Dialog", "TextLabel", None))
-
-
