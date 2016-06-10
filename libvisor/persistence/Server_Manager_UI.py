@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'F:\PROYECTOS_IH\trunk\Visor_WMS_QGIS\VisorWMS\libvisor\persistence\Server_Manager.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -72,4 +71,5 @@ class Ui_serverListDialog(object):
         self.buttonAdd.setShortcut(_translate("serverListDialog", "Alt+A", None))
         self.buttonRemove.setText(_translate("serverListDialog", "Remove server", None))
         self.buttonRemove.setShortcut(_translate("serverListDialog", "Alt+R", None))
+
 

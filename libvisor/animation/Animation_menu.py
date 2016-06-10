@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'F:\PROYECTOS_IH\trunk\Visor_WMS_QGIS\VisorWMS\libvisor\animation\Animation_menu.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -174,4 +173,5 @@ class Ui_dockAnimationWidget(object):
         self.label.setText(_translate("dockAnimationWidget", "Max time offset", None))
         self.labelInfo.setText(_translate("dockAnimationWidget", "animation_info_label", None))
         self.playButton.setText(_translate("dockAnimationWidget", "Play", None))
+
 

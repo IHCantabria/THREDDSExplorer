@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+#
 # Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -58,3 +59,5 @@ class Ui_AddLayerDialog(object):
         self.beginTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation begins at...", None))
         self.finishTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation finishes at...", None))
         self.buttonAddLayer.setText(_translate("AddLayerDialog", "Add to layer list", None))
+
+

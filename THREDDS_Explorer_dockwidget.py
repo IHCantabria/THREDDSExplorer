@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'THREDDS_Explorer_dockwidget_base.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -202,4 +201,5 @@ class Ui_THREDDSViewer(object):
         self.button_req_map.setText(_translate("THREDDSViewer", "Show map in view", None))
         self.button_req_animation.setText(_translate("THREDDSViewer", "Show animation menu >>", None))
         self.buttonManageServers.setText(_translate("THREDDSViewer", "Manage servers...", None))
+
 
