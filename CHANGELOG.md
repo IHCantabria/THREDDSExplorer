@@ -24,6 +24,7 @@
 
 * General
   - Trace errors into QGIS/THREDDSExplorer registry tab
+  - ui2py: script to automate .ui to .py conversion (2016-06-10)
 
 **v1.0** (2016-05-31)
 
