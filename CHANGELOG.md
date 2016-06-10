@@ -1,5 +1,7 @@
 **CURRENT**
 
+**v1.1** (2016-06-10)
+
 * ServerDataPersistenceManager.py
     - Solved bug when reading variable "GDALVersionErrorSetting" (2016.06.06)
 
@@ -19,7 +21,7 @@
 * THREDDS_Explorer_dockwidget_base.ui, THREDDS_Explorer_dockwidget.py
     - Add vertical and horizontal scrolls to the plugin's main user interface
 
-    
+
 * General
   - Trace errors into QGIS/THREDDSExplorer registry tab
 
