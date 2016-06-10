@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'F:\PROYECTOS_IH\trunk\Visor_WMS_QGIS\VisorWMS\libvisor\persistence\Server_Manager_Add_Server.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Fri Jun 10 13:27:54 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -67,4 +67,5 @@ class Ui_AddServerDialog(object):
         self.labelThreddsPath.setText(_translate("AddServerDialog", "Server name", None))
         self.label.setText(_translate("AddServerDialog", "(e.g. http://myserver.com/thredds)", None))
         self.buttonAddServer.setText(_translate("AddServerDialog", "Add server", None))
+
 
