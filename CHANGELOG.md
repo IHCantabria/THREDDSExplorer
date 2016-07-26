@@ -1,5 +1,13 @@
 **CURRENT**
 
+* Utilities.py
+    - Added function to check platform (Windows vs Linux)
+
+
+* WCSParser.py
+    - Create temporal file to store the .tiff from the WCS request for one point
+    in time
+
 **v1.1** (2016-06-10)
 
 * ServerDataPersistenceManager.py
