@@ -156,6 +156,18 @@ class WCSparser(object):
         tiff_string = "{ln}{id}".format(ln=layerName, id=uuid.uuid4())
         layer = QgsRasterLayer(geoTiffUrl, tiff_string)
 
+        if Utilities.is_linux():
+            import requests
+            with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as f:
+                r = requests.get(geoTiffUrl, stream=True)
+                with open(f.name, "wb") as g:
+                    for chunk in r.iter_content():
+                        g.write(chunk)
+
+                layer = QgsRasterLayer(f.name, layerName)
+        else:
+            layer = QgsRasterLayer(geoTiffUrl, layerName)
+
         if layer.isValid():
             return layer
         else:

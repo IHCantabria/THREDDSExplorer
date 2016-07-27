@@ -5,8 +5,7 @@
 
 
 * WCSParser.py
-    - Create temporal file to store the .tiff from the WCS request for one point
-    in time
+    - Solved bug when loading WCS layers:no me Creation of a temporal file to store the .tiff from the WCS request
 
 **v1.1** (2016-06-10)
 
