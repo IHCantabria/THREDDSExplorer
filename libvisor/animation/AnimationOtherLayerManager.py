@@ -6,8 +6,6 @@ Created on 22 de feb. de 2016
 from THREDDSExplorer.libvisor.animation import Animation_add_others
 from PyQt4.QtGui import QWidget, QPushButton
 from PyQt4.QtCore import pyqtSlot, pyqtSignal
-from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
-from THREDDSExplorer.libvisor.animation.Animation2 import AnimationData
 
 class AnimationOtherLayerManager(QWidget):
     '''

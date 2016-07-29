@@ -322,13 +322,13 @@ class Controller(QObject):
         :param     animationLayerList:    List of AnimationLayer to be created and managed
                                           by this controller.
         :type      animationLayerList:    [AnimationLayer]
-
         """
         for item in animationLayerList:
             worker = WCSDownloadWorkerThread(item.getMapObject().getWCS().getCapabilitiesURL(),
                                  item.getTimes(),
                                  item.getLayerName(),
-                                 parent = self)
+                                 item.getBBOX(),
+                                 parent=self)
 
             baseLayerDictionary = worker.getLayerDict()
             animData = AnimationData(item.getLayerName(), baseLayerDictionary)
@@ -338,7 +338,7 @@ class Controller(QObject):
             worker.WCSFrameFinishedDownload.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
             worker.WCSProcessdone.connect(self.BatchWorkerThreadDone)
             worker.WCSMapDownloadFail.connect(self.WorkerThreadDownloadError)
-            thread = threading.Thread(target = worker.run)
+            thread = threading.Thread(target=worker.run)
             self.threadsInUse[worker] = thread
             thread.start()
 
@@ -347,7 +347,6 @@ class Controller(QObject):
         :param     animationLayerList:    List of AnimationLayer to be created and managed
                                           by this controller.
         :type      animationLayerList:    [AnimationLayer]
-
         """
         for item in animationLayerList:
             worker = WMSDownloadWorkerThread(
