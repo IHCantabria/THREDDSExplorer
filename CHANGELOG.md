@@ -5,7 +5,11 @@
 
 
 * WCSParser.py
-    - Solved bug when loading WCS layers:no me Creation of a temporal file to store the .tiff from the WCS request
+    - Solved bug when loading WCS layers: Creation of a temporal file to store the .tiff from the WCS request
+    
+
+* icon.png
+    - Replaced the plugin icon (grey) to new one (blue)
 
 **v1.1** (2016-06-10)
 
