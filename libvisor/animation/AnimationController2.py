@@ -241,10 +241,6 @@ class Controller(QObject):
                 otherLayers.append(animationLayer)
             elif animationLayer.getService() == "WMS":
                 wmsLayers.append(animationLayer)
-                print "animationLayer:", animationLayer
-                print "animationLayer.getBBOX():", animationLayer.getBBOX()
-                print "animationLayer.bbox:", animationLayer.bbox
-                print "dir(animationLayer):", dir(animationLayer)
             elif animationLayer.getService() == "WCS":
                 wcsLayers.append(animationLayer)
 
@@ -332,15 +328,12 @@ class Controller(QObject):
         :type  animationLayerList: [AnimationLayer]
         """
         for item in animationLayerList:
-            print "item.getBBOX():", item.getBBOX()
-
             worker = WMSDownloadWorkerThread(
                     capabilitiesURL=item.getMapObject().getWMS(),
                     times=item.getTimes(),
                     layerName=item.getLayerName(),
                     style=item.getStyle(),
-                    #bbox=item.getBBOX(),
-                    bbox="-5.69403600693,34.8058242798,5.00073623657,44.7505760193",
+                    bbox=item.getBBOX(),
                     parent=self)
 
             baseLayerDictionary = worker.getLayerDict()
