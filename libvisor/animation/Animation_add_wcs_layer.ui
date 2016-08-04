@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>296</width>
-    <height>138</height>
+    <width>350</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>296</width>
-    <height>138</height>
+    <width>350</width>
+    <height>265</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>523</width>
-    <height>138</height>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -65,6 +65,48 @@
       </property>
      </item>
     </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout" rowminimumheight="0,0,0,0">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="southBound"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLineEdit" name="westBound"/>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLineEdit" name="eastBound"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="northBound">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="3">
+      <widget class="QLabel" name="labelCRS">
+       <property name="minimumSize">
+        <size>
+         <width>276</width>
+         <height>13</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>CRS INFO</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QPushButton" name="buttonAddLayer">

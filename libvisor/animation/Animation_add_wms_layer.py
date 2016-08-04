@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'libvisor\animation\Animation_add_wms_layer.ui'
 #
-# Created: Fri Jun 10 13:27:53 2016
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -27,7 +27,7 @@ class Ui_AddLayerDialog(object):
         AddLayerDialog.setObjectName(_fromUtf8("AddLayerDialog"))
         AddLayerDialog.resize(296, 166)
         AddLayerDialog.setMinimumSize(QtCore.QSize(296, 166))
-        AddLayerDialog.setMaximumSize(QtCore.QSize(296, 166))
+        AddLayerDialog.setMaximumSize(QtCore.QSize(500, 280))
         self.verticalLayout = QtGui.QVBoxLayout(AddLayerDialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.label = QtGui.QLabel(AddLayerDialog)
@@ -69,3 +69,4 @@ class Ui_AddLayerDialog(object):
         self.beginTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation begins at...", None))
         self.finishTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation finishes at...", None))
         self.buttonAddLayer.setText(_translate("AddLayerDialog", "Add to layer list", None))
+

@@ -1,80 +1,84 @@
 # -*- coding=utf8 -*-
-import xml.etree.ElementTree as ET
-from THREDDSExplorer.libvisor.providersmanagers.wms import WmsLayerInfo
-import urllib2
+
+# Standard libs:
 import json
 import time
-import threading
-from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
-from qgis.core import QgsRasterLayer
-from qgis.utils import iface
 import uuid
+import urllib2
+import threading
 from threading import RLock
+import xml.etree.ElementTree as ET
+
+# QGIS / PyQt libs:
+from qgis.core import QgsRasterLayer
 from PyQt4.Qt import pyqtSignal, QObject
 
+# Our libs:
+from THREDDSExplorer.libvisor.providersmanagers.wms import WmsLayerInfo
+from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
+
 class WMSparser(QObject):
-    """
-    Parsers to make objects from WMS service based maps.
+    """Parsers to make objects from WMS service based maps.
     
     Due to limits in QGIS API (read: 'Raster Layers' section, last paragraph
     http://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/loadlayer.html)
-    we have to process the capabilities.xml file ourselves
-    to extract all the data about available layers and
-    time dimensions for our own use.
-    
+    we have to process the capabilities.xml file ourselves to extract all the data
+    about available layers and time dimensions for our own use.
     """
-    
     lock = RLock()
     singleRangeBeginsChecking = pyqtSignal()
-    singleRangeChecked = pyqtSignal() #Useful for progress reporting. This is a 'long'
-                                        #operation which might make it seem the system
-                                        #is blocked while being performed.
+
+    # Useful for progress reporting. This is a 'long' operation which might 
+    # make it seem the system is blocked while being performed:
+    singleRangeChecked = pyqtSignal()
     
     def __init__(self, urlXML):
-        """
-        :param urlXML: Full URL to the capabilities.xml file of this 
-                                map.
-        :type urlXML:  str
+        """Constructor.
+
+        :param urlXML: full URL to the capabilities.xml file of this map.
+        :type  urlXML: str
         """
         super(WMSparser, self).__init__()
         self.namespace = '{http://www.opengis.net/wms}'
         self.xlink = '{http://www.w3.org/1999/xlink}'
         self.qgisWMSThack = 'IgnoreGetMapUrl=1&'#IgnoreGetFeatureInfoUrl=1&
         self.baseWMSUrl = (
-                        '&crs=EPSG:4326'
-                        '&srs=EPSG:4326'
-                        '&dpiMode=7'
-                        '&format=image/png'
-                        '&WIDTH=2048&HEIGHT=2048'
-                        '&SERVICE=WMS'
-                        '&layers={layer}'
-                        '&styles={style}'
-                        '&url={url}')
+              '&crs=EPSG:4326'
+              '&srs=EPSG:4326'
+              '&dpiMode=7'
+              '&format=image/png'
+              '&WIDTH=2048&HEIGHT=2048'
+              '&SERVICE=WMS'
+              '&layers={layer}'
+              '&styles={style}'
+              '&url={url}'
+        )
         
-        #URL to check the metadata for max and min
-        #values in the requested raster. This way,
-        #we can customize how it'll be retrieved by
-        #setting them in our map request.
+        # URL to check the metadata for max and min
+        # values in the requested raster. This way,
+        # we can customize how it'll be retrieved by
+        # setting them in our map request.
         baseResourceURL = urlXML.split("?")
-        self.WMSValueRangeCheckURL = (str(baseResourceURL[0]) +
-                        '?item=minmax'
-                        '&request=GetMetadata'
-                        '&crs=EPSG:4326'
-                        '&srs=EPSG:4326'
-                        '&dpiMode=7'
-                        '&WIDTH=2048&HEIGHT=2048'
-                        '&layers={layer}'
-                        '&BBOX={bbox}'
-                        '&TIME={time}' )
+        self.WMSValueRangeCheckURL = (
+            str(baseResourceURL[0]) +
+            '?item=minmax'
+            '&request=GetMetadata'
+            '&crs=EPSG:4326'
+            '&srs=EPSG:4326'
+            '&dpiMode=7'
+            '&WIDTH=2048&HEIGHT=2048'
+            '&layers={layer}'
+            '&TIME={time}'
+            '&BBOX={bbox}'
+        )
+        
         XML = urllib2.urlopen(urlXML).read()
         self.tree = ET.fromstring(XML)
         self.mapInfo = None
         self.mapLayer = None
 
-
     def getMapInfoFromCapabilities(self):
-        """
-        Will create a tree-like object with all the information
+        """Will create a tree-like object with all the information
         of interest in this WMS service about the map we are
         requesting, using the WmsLayerInfo data models.
         
@@ -135,9 +139,8 @@ class WMSparser(QObject):
             
             self.mapInfo.addLayer(layerObject)
         
-    def createMapLayer(self, mapLayerName, layerStyleName, layerTime="", minMaxRange=None):
-        """
-        Will create a QGIS valid raster layer for the
+    def createMapLayer(self, mapLayerName, layerStyleName, boundingBox, layerTime="", minMaxRange=None):
+        """Will create a QGIS valid raster layer for the
         parsed map, using the passed parameters to get the
         layer we need, with the requested style, and optionally
         a time dimension.
@@ -170,7 +173,8 @@ class WMSparser(QObject):
             self.getMapInfoFromCapabilities()
             
         if minMaxRange == None:
-            minMaxRange = self.getMinMaxRasterValuesFromTimeRange(mapLayerName, layerStyleName, [layerTime])
+            minMaxRange = self.getMinMaxRasterValuesFromTimeRange(
+                                  mapLayerName, layerStyleName, [layerTime], boundingBox)
             
         rasterMinMaxValues = str(minMaxRange[0])+","+str(minMaxRange[1])
         #print("Raster range for "+mapLayerName+"_"+layerStyleName+": "+rasterMinMaxValues)
@@ -178,20 +182,24 @@ class WMSparser(QObject):
         finalUrl = self.baseWMSUrl.format(layer=mapLayerName, 
                         style=layerStyleName,
                         url=self.mapInfo.getURL())
-        
         #We add an UUID to guarantee uniqueness in the layer name and id
         layerName = self.mapInfo.getName()+"-"+str(uuid.uuid4())
         resultLayer = QgsRasterLayer(finalUrl, layerName, 'wms')
         
         #HACK taken from Anita Graser's Time Manager:
         #https://github.com/anitagraser/TimeManager/blob/master/raster/wmstlayer.py
-        #(Under GPL2 license) with an extra added for COLORSCALERANGE ncWMS attribute.
+        #(Under GPL2 license) with an extra added for COLORSCALERANGE ncWMS attribute
+        #and BOUNDINGBOX information (which is removed when constructing layers by qgis
+        #it seems?)
+        #TODO: Bounding box information is not processed by QGIS. QGIS C++ WMS provider
+        #apparently re-creates the request with a previously read bounding box information
+        #from the capabilities.xml file. This needs a workaround, or reature request to QGIS.
         resultLayer.dataProvider().setDataSourceUri(self.qgisWMSThack
                                                     + resultLayer.dataProvider().dataSourceUri() 
-                                                    + "?TIME={time}%26COLORSCALERANGE={scale}"
-                                                        .format(time = layerTime, scale=rasterMinMaxValues))
-        
-
+                                                    + "?TIME={time}%26COLORSCALERANGE={scale}%26BBOX={bbox}"
+                                                        .format(time = layerTime,
+                                                                scale=rasterMinMaxValues,
+                                                                bbox=str(boundingBox)))
         
         if resultLayer.isValid():
             self.mapLayer = resultLayer
@@ -199,35 +207,28 @@ class WMSparser(QObject):
             raise StandardError('No se pudo crear una capa válida.')
     
     def getMapInfo(self):
-        """
-        Retrieves our cached map information object
-        or creates it anew if null.
-        """
+        """Retrieves our cached map information object or creates it anew if null."""
+
         if self.mapInfo is None:
             self.getMapInfoFromCapabilities()
         
         return self.mapInfo
         
     def getLastCreatedMapLayer(self):
-        """
-        Retrieves the last created layer in this object.
-        """
+        """Retrieves the last created layer in this object."""
+
         return self.mapLayer;
     
-    def getMinMaxRasterValuesFromTimeRange(self, mapLayerName, layerStyleName, listOfTimes):
-        """
-        Returns a tuple of the (minimum, maximum) values for
+    def getMinMaxRasterValuesFromTimeRange(self, mapLayerName, layerStyleName, listOfTimes, boundingBox):
+        """Returns a tuple of the (minimum, maximum) values for
         this raster. Useful if we want to create a coherent
         legend for an animation or between a number of different
         times for the same area.
         """
-        #We retrieve the bounding box data to be sent with the 
-        #request to find the min/max range values for the raster.
+        # We retrieve the bounding box data to be sent with the 
+        # request to find the min/max range values for the raster.
         if self.mapInfo == None:
             self.getMapInfoFromCapabilities()
-            
-        boundingBoxData = ([x.getBoundingBoxInfo() for x in self.mapInfo.getLayers() 
-                                if x.getName() == mapLayerName])[0]
                                
         threads = []
          
@@ -239,8 +240,7 @@ class WMSparser(QObject):
             pathForJSON = self.WMSValueRangeCheckURL.format(
                           layer=mapLayerName,
                           style=layerStyleName,
-                          bbox=boundingBoxData.getWest()+','+boundingBoxData.getSouth()
-                                +','+boundingBoxData.getEast()+','+boundingBoxData.getNorth(),
+                          bbox=str(boundingBox),
                           time = moment)
             thread = threading.Thread(target = self._getRangeValuesFromJSONPath, args=(pathForJSON,))
             threads.append(thread)
@@ -256,14 +256,14 @@ class WMSparser(QObject):
             return None
     
     def _getRangeValuesFromJSONPath(self, jsonPath):
-            #print("CALCULATING RANGE: "+jsonPath+" at system time "+str(datetime.datetime.now()))
-            jsonRawData = urllib2.urlopen(jsonPath)
-            jsonObject = json.load(jsonRawData)
-            newMin = jsonObject["min"]
-            newMax = jsonObject["max"]
-            self.checkAgainstRanges(newMin, newMax)
-            #print("RANGE CALCULATED: "+jsonPath+" at system time "+str(datetime.datetime.now()))
-            self.singleRangeChecked.emit()
+        #print("CALCULATING RANGE: "+jsonPath+" at system time "+str(datetime.datetime.now()))
+        jsonRawData = urllib2.urlopen(jsonPath)
+        jsonObject = json.load(jsonRawData)
+        newMin = jsonObject["min"]
+        newMax = jsonObject["max"]
+        self.checkAgainstRanges(newMin, newMax)
+        #print("RANGE CALCULATED: "+jsonPath+" at system time "+str(datetime.datetime.now()))
+        self.singleRangeChecked.emit()
         
     def checkAgainstRanges(self, newMin, newMax):
         with self.lock:
@@ -282,4 +282,3 @@ class WMSparser(QObject):
                 
             #print(">> CHECKED RANGE"+str(newMin)+"_"+str(newMax)+" at system time "+str(datetime.datetime.now()))
             
-        

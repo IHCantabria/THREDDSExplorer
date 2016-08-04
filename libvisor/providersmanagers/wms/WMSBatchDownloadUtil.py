@@ -28,7 +28,7 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
     WMSSingleValueRangeProcessed = pyqtSignal()
     WMSMapDownloadFail = pyqtSignal(int, str)
     
-    def __init__(self, capabilitiesURL, times, layerName, style, parent = None, jobName = None):
+    def __init__(self, capabilitiesURL, times, layerName, style, bbox, parent = None, jobName = None):
         """
         :param capabilitiesURL:     The URL to the capabilities.xml file for this map.
         :type  capabilitiesURL:     str
@@ -53,6 +53,7 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         self.capabilitiesURL = capabilitiesURL
         self.times = times
         self.layerName = layerName
+        self.bbox = bbox
         self.style = style
         self.cancel = False
         self.parser = WMSparser(self.capabilitiesURL)
@@ -66,7 +67,6 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         #We just want their signals to update our progress status.
         self.parser.singleRangeChecked.connect(self.WMSSingleValueRangeProcessed.emit, Qt.DirectConnection)
         #self.parser.singleRangeBeginsChecking.connect(self.WMSSingleValueRangeProcessed.emit, Qt.DirectConnection)
-        
         
     def getLayerDict(self):
         return super(WMSDownloadWorkerThread, self).getLayerDict()    
@@ -85,13 +85,15 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         #First, we will calculate the min and max values for this map in all
         #the instants we want to retrieve, to make a coherent color palette
         #so each color will represent the same values range across all the frames.
-        valuesRange = self.parser.getMinMaxRasterValuesFromTimeRange(self.layerName, self.style, self.times)
+        valuesRange = self.parser.getMinMaxRasterValuesFromTimeRange(self.layerName, self.style,
+                                                                      self.times, self.bbox)
         times = [x.replace(".000","") for x in self.times]
         for moment in times:
             if self.cancel == True:
                 return
             self.WMSFrameStartsDownload.emit()
-            self.parser.createMapLayer(self.layerName, self.style, layerTime = moment, minMaxRange = valuesRange)
+            self.parser.createMapLayer(self.layerName, self.style, self.bbox,
+                                        layerTime = moment, minMaxRange = valuesRange)
             layer = self.parser.getLastCreatedMapLayer()
             if layer is not None and layer.isValid() == True:
                 #outputFormattedTime = (datetime.strptime(moment, self.inTimeFormat))\

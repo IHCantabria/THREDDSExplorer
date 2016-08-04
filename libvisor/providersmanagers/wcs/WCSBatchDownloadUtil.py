@@ -7,7 +7,6 @@ from PyQt4.QtCore import pyqtSignal
 from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSParser import WCSparser
 from datetime import datetime
 from THREDDSExplorer.libvisor.providersmanagers.DownloadWorkerThread import DownloadWorkerThread
-from THREDDSExplorer.libvisor.animation.Animation2 import AnimationData
 
 
 class WCSDownloadWorkerThread(DownloadWorkerThread):
@@ -26,7 +25,8 @@ class WCSDownloadWorkerThread(DownloadWorkerThread):
     WCSFrameFinishedDownload = pyqtSignal()
     WCSMapDownloadFail = pyqtSignal(int, str)
 
-    def __init__(self, capabilitiesURL, times, layerName, parent = None, jobName = None):
+    def __init__(self, capabilitiesURL, times, layerName,
+                 boundingBox, parent = None, jobName = None):
         """
         :param capabilitiesURL:     The URL to the capabilities.xml file for this map.
         :type  capabilitiesURL:     str
@@ -36,6 +36,9 @@ class WCSDownloadWorkerThread(DownloadWorkerThread):
         
         :param layerName: Name of the layer we must request.
         :type  layerName: str
+        
+        :param boundingBox: Bounding box extent to be requested
+        :type  boundingBox: BoundingBox
         
         :param jobName: Identifier string for this work thread (optional)
         :type  jobName: str
@@ -51,6 +54,7 @@ class WCSDownloadWorkerThread(DownloadWorkerThread):
         self.capabilitiesURL = capabilitiesURL
         self.times = times
         self.layerName = layerName
+        self.boundingBox = boundingBox
         self.cancel = False
         self.inTimeFormat = "%Y-%m-%dT%H:%M:%SZ"
         self.outTimeFormat = "%Y-%m-%d %H:%M:%S"
@@ -77,7 +81,7 @@ class WCSDownloadWorkerThread(DownloadWorkerThread):
                 return
             
             self.WCSFrameStartsDownload.emit()
-            mapDownloadURL = parser.generateURLForGeoTIFF(self.layerName, moment)
+            mapDownloadURL = parser.generateURLForGeoTIFF(self.layerName, moment, self.boundingBox)
             layer = parser.generateLayerFromGeoTIFFURL(mapDownloadURL, moment+"_"+self.layerName)
             if layer is not None and layer.isValid() == True:
                 #outputFormattedTime = (datetime.strptime(moment, self.inTimeFormat))\
