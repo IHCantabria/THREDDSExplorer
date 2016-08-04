@@ -68,7 +68,6 @@ class WMSDownloadWorkerThread(DownloadWorkerThread):
         self.parser.singleRangeChecked.connect(self.WMSSingleValueRangeProcessed.emit, Qt.DirectConnection)
         #self.parser.singleRangeBeginsChecking.connect(self.WMSSingleValueRangeProcessed.emit, Qt.DirectConnection)
         
-        
     def getLayerDict(self):
         return super(WMSDownloadWorkerThread, self).getLayerDict()    
         

@@ -1,34 +1,38 @@
-'''
+"""
 Created on 20 de ene. de 2016
 
 @author: IHC
-'''
-from PyQt4.QtGui import QTableWidgetItem, QDockWidget
-from THREDDSExplorer.libvisor.animation import AnimationWCSManager, AnimationWMSManager,\
-    Animation_menu
-from PyQt4.QtGui import QMessageBox
-from PyQt4.Qt import pyqtSlot, pyqtSignal, Qt
+"""
+
+# Standard libs:
 import time
 import threading
-from THREDDSExplorer.libvisor.animation.AnimationController2 import Controller
-from qgis.utils import iface
-from PyQt4.QtCore import QTime
+import traceback
+from _socket import timeout
+from urllib2 import URLError
 from datetime import timedelta
 from httplib import HTTPException
-from urllib2 import URLError
-from _socket import timeout
+
+# QGIS / PyQt libs:
+from qgis.utils import iface
+from PyQt4.QtCore import QTime
+from PyQt4.QtGui import QMessageBox
 from qgis.core import QgsMessageLog
-import traceback
+from PyQt4.Qt import pyqtSlot, pyqtSignal, Qt
+from PyQt4.QtGui import QTableWidgetItem, QDockWidget
+
+# Our libs:
+from THREDDSExplorer.libvisor.animation.AnimationController2 import Controller
+from THREDDSExplorer.libvisor.animation import AnimationWCSManager, AnimationWMSManager, Animation_menu
 
 class AnimationFrame(QDockWidget):
-    '''
-    Animation widget UI manager.
+    """Animation widget UI manager.
 
     It basically redirects all inputs to AnimationController.Controller,
     which behaves as a controller/presenter.
 
     This interface must be given the MapObject to work with
-    '''
+    """
     lock = threading.RLock()
     errorSignal = pyqtSignal(str) #We will delegate any error reporting to the class which uses this widget.
 
@@ -53,7 +57,6 @@ class AnimationFrame(QDockWidget):
         #self.animationUI.playButton.setEnabled(False)
         self.animationUI.cancelButton.hide()
 
-
         self.animationUI.addWCSButton.clicked.connect(self._onAddWCSLayerButtonClicked)
         self.animationUI.addWMSButton.clicked.connect(self._onAddWMSLayerButtonClicked)
         self.animationUI.addOtherButton.clicked.connect(self._onAddOtherLayerButtonClicked)
@@ -69,22 +72,17 @@ class AnimationFrame(QDockWidget):
         self.animationUI.timeTolerance.timeChanged.connect(self._toleranceChanged)
         self.animationUI.daysTolerance.valueChanged.connect(self._toleranceChanged)
 
-
         self.initController()
         self.animationUI.timeFrameVariation.setTime(QTime(1, 0, 0))
         self._timeVariationChanged(QTime(1, 0, 0))
 
-
         iface.addDockWidget( Qt.LeftDockWidgetArea, self )
 
-
     def initController(self):
-        """
-        Initializes a new controller to handle all the animation functions.
-        """
+        """Initializes a new controller to handle all the animation functions."""
+
         self.controller = Controller(self.parent)
         self.controller.animationGenerationStepDone.connect(self._updateProgressBar)
-
         self.controller.newFrameShown.connect(self._updateSeekBar)
         self.controller.animatorReady.connect(self._onAnimationReady)
         self.controller.externalAnimationLoaded.connect(self._addLayerToAnimation)
@@ -92,22 +90,18 @@ class AnimationFrame(QDockWidget):
         self.controller.statusSignal.connect(self._updateInfoText)
         self.controller.animationPlaybackEnd.connect(self._onAnimationPlaybackFinish)
 
-
-
     @pyqtSlot()
     def _removeLayerFromAnimation(self):
-        """
-        Removes one of the layers to be animated from the animation handler.
-        """
+        """Removes one of the layers to be animated from the animation handler."""
+
         selectedIndex = self.animationUI.tableLayerList.currentRow()
         if selectedIndex >= 0:
             self.layerInfoList.remove(self.layerInfoList[selectedIndex])
             self._updateTable()
 
-
     @pyqtSlot()
     def _onCancelRequested(self):
-        if self.controller is not None:
+        if self.controller:
             self.controller.cancelLoad()
 
     @pyqtSlot(str)
@@ -124,7 +118,7 @@ class AnimationFrame(QDockWidget):
 
     @pyqtSlot()
     def _onAddWCSLayerButtonClicked(self):
-        if self.mapObject is not None and self.mapObject.getWCS() is not None:
+        if self.mapObject and self.mapObject.getWCS():
             self.addLayerMenu = AnimationWCSManager.AnimationWCSLayerManager(self.mapObject)
             self.addLayerMenu.animationLayerCreated.connect(self._addLayerToAnimation)
             self.addLayerMenu.show()
@@ -133,12 +127,12 @@ class AnimationFrame(QDockWidget):
 
     @pyqtSlot()
     def _onAddWMSLayerButtonClicked(self):
-        if self.mapObject is not None:
+        if self.mapObject:
             try:
                 self.addLayerMenu = AnimationWMSManager.AnimationWMSLayerManager(self.mapObject)
                 self.addLayerMenu.animationLayerCreated.connect(self._addLayerToAnimation)
                 self.addLayerMenu.show()
-            except (HTTPException,URLError, timeout):
+            except (HTTPException, URLError, timeout):
                 self.onError("Connection error: Server or resource unreachable.")
                 QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
         else:
@@ -152,16 +146,16 @@ class AnimationFrame(QDockWidget):
 
     @pyqtSlot(object)
     def _addLayerToAnimation(self, animationLayer):
-        """
-        Will create an AnimationLayer object with the required information,
+        """Will create an AnimationLayer object with the required information,
         and append it to our self.layerList internal list.
         """
-        if self.addLayerMenu is not None:
+        al = animationLayer
+        if self.addLayerMenu:
             self.addLayerMenu.close()
             self.addLayerMenu = None
+
         self.layerInfoList.append(animationLayer)
         self._updateTable()
-
 
     @pyqtSlot(int)
     def onUserMovesSlider(self, newValue):
@@ -170,10 +164,8 @@ class AnimationFrame(QDockWidget):
             time.sleep(0.1) #Dirty hack to avoid an extreme number of value updates per second.
 
     def _updateTable(self):
-        """
-        Updates the visual reference of which layers and maps are queued
-        for animation.
-        """
+        """Updates the visual reference of which layers and maps are queued for animation. """
+
         table = self.animationUI.tableLayerList
         table.setRowCount(len(self.layerInfoList))
         table.setColumnCount(3)
@@ -197,13 +189,13 @@ class AnimationFrame(QDockWidget):
 
     @pyqtSlot(tuple)
     def _updateSeekBar(self, infoTuple):
-        """
+        """Update the seek bar.
+
         :param infoTuple: information about the frame number and frame descriptive text
         :type  infoTuple: tuple: (frameNumber, infoText)
         """
         self._updateInfoText(infoTuple[1])
         self.animationUI.animationSlider.setValue(infoTuple[0])
-
 
     @pyqtSlot(int)
     def _newFrameRateSelected(self, frameRateMilliseconds):
@@ -235,31 +227,29 @@ class AnimationFrame(QDockWidget):
 
         self.controller.setTimeDeviationTolerance(tolerance)
 
-
     def setAnimationInformation(self, mapObject):
-        """
-        Method used to store the Map object which holds the
+        """Method used to store the Map object which holds the
         required information we may need to generate an
         AnimationLayer for it later.
 
-        :param     mapObject:
-        :type      mapObject: threddsMapperGeneric.Map
+        :param mapObject:
+        :type  mapObject: threddsMapperGeneric.Map
         """
         self.mapObject = mapObject
-        if self.controller is not None and self.controller.isPlaying(): #We will pause the animation, if running, when our data is updated.
+        # We will pause the animation, if running, when our data is updated:
+        if self.controller and self.controller.isPlaying():
             self.play()
-        if self.mapObject.getWCS() == None:
+
+        if not self.mapObject.getWCS():
             self.animationUI.addWCSButton.setEnabled(False)
-        if self.mapObject.getWMS() == None:
+
+        if not self.mapObject.getWMS():
             self.animationUI.addWButton.setEnabled(False)
 
-
     def prepareAnimation(self):
-        """
-        Puts the UI in "load mode", showing or hiding
-        certain controls. It will relay the request
-        to its controller and provide it with some
-        default values.
+        """Puts the UI in "load mode", showing or hiding certain controls.
+        It will relay the request to its controller and provide it
+        with some default values.
         """
         if self.controller.isPlaying():
             self.controller.pause()
@@ -277,21 +267,16 @@ class AnimationFrame(QDockWidget):
             self.onError(str(e))
             QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
 
-
-
     def play(self):
         self.animationUI.labelInfo.show()
-        #Sanity check to avoid QGIS crashes if the user
-        #attempts to create a new animation while an old
-        #one is playing
+        # Sanity check to avoid QGIS crashes if the user attempts to create
+        # a new animation while an old one is playing:
         if self.controller is not None:
             self.controller.togglePlay()
 
-
     @pyqtSlot()
     def _onAnimationReady(self):
-        """
-        Sets up the interface so the user can now
+        """Sets up the interface so the user can now
         interact with the animation playback components.
         """
         self.animationUI.progressBar.hide()
@@ -304,7 +289,6 @@ class AnimationFrame(QDockWidget):
         if self.animationUI.loopCheckbox.isChecked():
             self.play()
 
-
     def onError(self, messageString):
         box = QMessageBox()
         box.setText(messageString)
@@ -312,13 +296,9 @@ class AnimationFrame(QDockWidget):
         box.exec_()
 
     def onSaveAnimation(self):
-        """
-        TODO: Implement
-        """
+        """TODO: Implement"""
         pass
 
     def onLoadAnimation(self):
-        """
-        TODO: Implement
-        """
+        """TODO: Implement"""
         pass

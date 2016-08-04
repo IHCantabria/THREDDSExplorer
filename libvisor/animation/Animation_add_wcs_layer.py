@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'libvisor\animation\Animation_add_wcs_layer.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -24,8 +25,8 @@ except AttributeError:
 class Ui_AddLayerDialog(object):
     def setupUi(self, AddLayerDialog):
         AddLayerDialog.setObjectName(_fromUtf8("AddLayerDialog"))
-        AddLayerDialog.resize(296, 256)
-        AddLayerDialog.setMinimumSize(QtCore.QSize(296, 256))
+        AddLayerDialog.resize(350, 265)
+        AddLayerDialog.setMinimumSize(QtCore.QSize(350, 265))
         AddLayerDialog.setMaximumSize(QtCore.QSize(523, 500))
         self.verticalLayout = QtGui.QVBoxLayout(AddLayerDialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
@@ -59,6 +60,11 @@ class Ui_AddLayerDialog(object):
         self.eastBound.setObjectName(_fromUtf8("eastBound"))
         self.gridLayout.addWidget(self.eastBound, 2, 2, 1, 1)
         self.northBound = QtGui.QLineEdit(AddLayerDialog)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.northBound.sizePolicy().hasHeightForWidth())
+        self.northBound.setSizePolicy(sizePolicy)
         self.northBound.setObjectName(_fromUtf8("northBound"))
         self.gridLayout.addWidget(self.northBound, 1, 1, 1, 1)
         self.labelCRS = QtGui.QLabel(AddLayerDialog)
@@ -81,5 +87,4 @@ class Ui_AddLayerDialog(object):
         self.finishTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation finishes at...", None))
         self.labelCRS.setText(_translate("AddLayerDialog", "CRS INFO", None))
         self.buttonAddLayer.setText(_translate("AddLayerDialog", "Add to layer list", None))
-
 

@@ -13,21 +13,19 @@ from _socket import timeout
 
 
 class AnimationWMSLayerManager(QWidget):
-    '''
-    Manager which will allow an user to load a new layer
+    """Manager which will allow an user to load a new layer
     information object (AnimationLayer) through WCS services.
     
     This is an useful example on how we could implement
     an AnimationLayer generator to be loaded through
     AnimationOtherLayerManager, using its own UI and data
     provider method.
-    '''
+    """
     animationLayerCreated = pyqtSignal(object) #Should return instance of AnimationLayer
 
     def __init__(self, mapObject):
-        '''
-        Constructor
-        '''
+        """Constructor."""
+
         QWidget.__init__(self)
         self.dialog = Animation_add_wms_layer.Ui_AddLayerDialog()
         self.dialog.setupUi(self)
@@ -41,9 +39,8 @@ class AnimationWMSLayerManager(QWidget):
         
         self.dialog.buttonAddLayer.clicked.connect(self._onAcceptClicked)
         
-        
     def loadLayerList(self):
-        self.dialog.buttonAddLayer.setEnabled(False) #We disable the accept button while no layer can be created
+        self.dialog.buttonAddLayer.setEnabled(False) # we disable the accept button while no layer can be created
         parser = WMSparser(self.mapObject.getWMS())
         self.dialog.layerSelector.clear()
         try:
@@ -57,15 +54,15 @@ class AnimationWMSLayerManager(QWidget):
             self.dialog.finishTimeSelector.addItem("No times available")
             self.dialog.graphicSelector.clear()
             self.dialog.graphicSelector.addItem("No styles available.")
+
             return
         
-        
-        
-        if self.mapInfo is not None:
+        if self.mapInfo:
             self.dialog.layerSelector.addItems([x.getName() for x in self.mapInfo.getLayers()])
             
         self.dialog.layerSelector.setCurrentIndex(0)
-        #We force a first update on the available times...
+
+        # We force a first update on the available times:
         self._onSelectedLayerChanged(self.dialog.layerSelector.currentText())
         
     @pyqtSlot(str)
@@ -105,17 +102,25 @@ class AnimationWMSLayerManager(QWidget):
     @pyqtSlot()
     def _onAcceptClicked(self):
         selectedLayer = self.dialog.layerSelector.currentText()
+
+        # Get bounding box, if possible. Default is None.
+        bbox = None
+        if self.mapInfo:
+            for layer in self.mapInfo.getLayers():
+                if layer.getName() == selectedLayer:
+                    bbox = layer.getBoundingBoxInfo()
+
         allAvailableTimes = self.selectedLayer.getTimes()
         selectedBeginTimeIndex = allAvailableTimes.index(self.dialog.beginTimeSelector.currentText())
         selectedFinishTimeIndex = allAvailableTimes.index(self.dialog.finishTimeSelector.currentText())
-        selectedLayer = self.dialog.layerSelector.currentText()
-        selectedGraphic = self.dialog.graphicSelector.currentText()
-        
-        returnObject = AnimationLayer(self.mapObject,
-                                      selectedLayer,
-                                      allAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex+1],
-                                      "WMS",
-                                      selectedStyle = selectedGraphic)
+
+        returnObject = AnimationLayer(
+                mapObject=self.mapObject,
+                layerName=selectedLayer,
+                times=allAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex+1],
+                service="WMS",
+                boundingBox=bbox,
+                selectedStyle=self.dialog.graphicSelector.currentText())
+
         self.animationLayerCreated.emit(returnObject)
-    
-    
+

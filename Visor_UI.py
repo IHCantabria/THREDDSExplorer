@@ -575,11 +575,14 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
     @pyqtSlot(list, str)
     def createLayerGroup(self, layerList, groupName):
-        groupifier = LayerGroupifier(layerList, groupName)
-        groupifier.setSingleLayerSelectionModeInGroup(False)
-        groupifier.statusSignal.connect(self.postInformationMessageToUser, Qt.DirectConnection)
-        groupifier.groupifyComplete.connect(self._onNewLayerGroupGenerated)
-        groupifier.groupify()
+        if layerList:
+            groupifier = LayerGroupifier(layerList, groupName)
+            groupifier.setSingleLayerSelectionModeInGroup(False)
+            groupifier.statusSignal.connect(self.postInformationMessageToUser, Qt.DirectConnection)
+            groupifier.groupifyComplete.connect(self._onNewLayerGroupGenerated)
+            groupifier.groupify()
+        else:
+            self.postInformationMessageToUser("There was a problem showing the time series.")
 
     @pyqtSlot(QgsLayerTreeGroup, list)
     def _onNewLayerGroupGenerated(self, groupObject, layerList):
@@ -593,7 +596,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         :param layerList: The layers which are held in the group object.
         :type  layerList: [QgsLayer]
         """
-        if (layerList[0]).isValid() is True:
+        if (layerList[0]).isValid():
             iface.legendInterface().setLayerVisible(layerList[0], True)
         else:
             self.postInformationMessageToUser("There was a problem showing a layer.")
@@ -611,7 +614,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
 
         self.postInformationMessageToUser("Layer '"+image[1]+"' ["+image[2]+"]retrieved")
         layer = image[0]
-        if layer.isValid() is True:
+        if layer and layer.isValid():
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             iface.zoomToActiveLayer()
             iface.legendInterface().refreshLayerSymbology(layer)
