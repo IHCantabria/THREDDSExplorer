@@ -1,12 +1,26 @@
 **CURRENT**
 
+* AnimationController2.py, AnimationWMSManager.py, WMSBatchDownloadUtil.py, WMSParser.py
+    - Added functionality to work with editable bbox
+
+
+* Visor_UI.py
+     - Added feedback when loading WCS layers with invalid bbox
+     - Added functionality to work with editable bbox
+
+
+* THREDDS_Explorer_dockwidget_base.ui, Animation_add_wcs_layer.ui
+    - Modified interface with editable values for WCS boundingBox
+
+
 * Utilities.py
     - Added function to check platform (Windows vs Linux)
 
 
 * WCSParser.py
     - Solved bug when loading WCS layers: Creation of a temporal file to store the .tiff from the WCS request
-    
+    - Added functionality to work with editable bbox
+
 
 * icon.png
     - Replaced the plugin icon (grey) to new one (blue)
