@@ -101,31 +101,29 @@ class ServerStorageManager(QDialog):
         servers pre-configured in them. Will also restore their properties if they
         have previously been changed.
         """
-        defaultServers = []
         # settings = QSettings()
         # settings.beginGroup(self.ThreddsServerGroup)
         # for setting in settings.allKeys():
         #     settings.remove(setting)
+        defaults = (
+                ('NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'),
+                ('NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'),
+                ('Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/'),
+        )
+        for name,url in defaults:
+            self._saveServerInSettings(ThreddsServerInfoObject(name, url))
 
-        defaultServers.append(['NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'])
-        defaultServers.append(['NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'])
-        defaultServers.append(['Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/'])
-
-        for srv in defaultServers:
-            self._saveServerInSettings(srv[0], srv[1])
-
-    def _saveServerInSettings(self, serverName, serverURL):
-        """Stores the required information to access a thredds
+    def _saveServerInSettings(self, serverInfoObject):
+        """Stores an object containing the required information to access a thredds
         server in a settings object for persistence.
 
-        :param serverName: the name of the server we want to store
-        :type  serverName: str
-
-        :param serverURL:  the URL of the server we want to store
-        :type  serverName: str
+        :param serverInfoObject: the server object with the information we want to store
+        :type  serverInfoObject: ThreddsServerInfoObject
         """
         settings = QSettings()
-        settings.setValue(self.ThreddsServerGroup+r'/'+serverName, serverURL)
+        k = "/".join([self.ThreddsServerGroup, serverInfoObject.getName()])
+        v = serverInfoObject.getURL()
+        settings.setValue(k, v)
 
     def retrieveAllStoredServerInfo(self):
         """Retrieves a list of ThreddsServerInfo objects stored in the
@@ -136,21 +134,28 @@ class ServerStorageManager(QDialog):
         us to store other configuration settings under other 'namespaces'
         using the same QSettings object.
 
-        :returns A list of objects which contain information about
-                 the thredds servers previously stored in the settings
-                 object.
+        :returns A list of objects which contain information about the thredds
+                 servers previously stored in the settings object.
         :rtype   [ThreddsServerInfoObject]
         """
         serverList = []
         settings = QSettings()
         settings.beginGroup(self.ThreddsServerGroup)
-        for element in settings.childKeys():
-            srv = settings.value(element)
-            srv_info = ThreddsServerInfoObject(element, srv)
-            if srv_info:
-                serverList.append(srv_info);
+
+        for key in settings.childKeys():
+            ret = settings.value(key)
+            if type(ret) in [ str, unicode ]:
+                name, url = key, ret
+            else:
+                try:
+                    name, url = ret
+                except:
+                    continue
+
+            serverList.append(ThreddsServerInfoObject(name, url));
 
         settings.endGroup()
+
         return serverList
 
     def _onbuttonLoadDataClick(self):
@@ -171,16 +176,14 @@ class ServerStorageManager(QDialog):
         nameColumn = 0 #The column we have the names of the servers shown at.
         deleteTarget = self.serverListDialog.tableWidget.item(selectedRow, nameColumn)
 
-        if deleteTarget is not None: #Just in case the user attempts to remove an element when none are shown or selected
+        if deleteTarget: # just in case the user attempts to remove an element when none are shown or selected
             reply = QMessageBox.question(self, "Confirm deletion",
-                         'Are you sure you want to remove server "'+deleteTarget.text()+'"?',
-                         QMessageBox.Yes, QMessageBox.No)
+                        'Are you sure you want to remove server {s}?"'.format(s=deleteTarget.text()),
+                        QMessageBox.Yes, QMessageBox.No)
 
             if reply == QMessageBox.Yes:
                 self.deleteServerInfo(deleteTarget.text())
                 self.reloadTable()
-            else:
-                pass
 
     @pyqtSlot(tuple)
     def _onAttemptToAddNewServer(self, inServerDetails):
@@ -188,18 +191,18 @@ class ServerStorageManager(QDialog):
         and then adds them to the underlying storage system. Will hide the add server
         window or show an error message depending on the outcome of this operation."""
 
-        if isValidName(inServerDetails[0]) is False:
+        if not isValidName(inServerDetails[0]):
             msg  = "The provided name is not valid.\n"
             msg += "Make sure it is not empty, and doesn't have any slashes ('/') in it."
             QMessageBox.warning(self, "Warning", msg)
 
-        elif isValidURL(inServerDetails[1]) is False:
+        elif not isValidURL(inServerDetails[1]):
             msg = "The provided URL is not valid.\nMake sure it is not empty."
             QMessageBox.warning(self, "Warning", msg)
 
         else:
             serverInfo = ThreddsServerInfoObject(inServerDetails[0], inServerDetails[1])
-            self._saveServerInSettings(serverInfo.getName(), serverInfo.getURL())
+            self._saveServerInSettings(serverInfo)
             self.addServerWindowManager.close()
             self.addServerWindowManager = None
             self.reloadTable()
@@ -223,8 +226,7 @@ class ServerStorageManager(QDialog):
                 return False
 
         else:
-            # Default:
-            return True
+            return True # default:
 
     @show_GDAL_error.setter
     def show_GDAL_error(self, val):
