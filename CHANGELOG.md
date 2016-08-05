@@ -1,5 +1,9 @@
 **CURRENT**
 
+* ServerDataPersistenceManager.py
+    - Fixed persistence of server list in Linux converting them to new format 
+
+
 * AnimationController2.py, AnimationWMSManager.py, WMSBatchDownloadUtil.py, WMSParser.py
     - Added functionality to work with editable bbox
 
