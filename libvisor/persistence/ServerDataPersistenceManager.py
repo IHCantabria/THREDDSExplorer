@@ -19,8 +19,7 @@ from THREDDSExplorer.libvisor.persistence.AddServerWindowManager import AddServe
 from THREDDSExplorer.libvisor.persistence.ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
 
 class ServerStorageManager(QDialog):
-    """
-    Handles persistence of preferences for this application,
+    """Handles persistence of preferences for this application,
     using QGIS settings storage API. Will also handle
     user interaction with the persisted objects.
 
@@ -38,7 +37,7 @@ class ServerStorageManager(QDialog):
     """
     serverSelected = pyqtSignal(ThreddsServerInfoObject)
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         """Constructor."""
 
         super(ServerStorageManager, self).__init__(parent)
@@ -73,12 +72,11 @@ class ServerStorageManager(QDialog):
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         for (i, item) in enumerate(self.availableServers):
-            table.setItem(i,0, QTableWidgetItem(item.getName()))
-            table.setItem(i,1, QTableWidgetItem(item.getURL()))
+            table.setItem(i, 0, QTableWidgetItem(item.getName()))
+            table.setItem(i, 1, QTableWidgetItem(item.getURL()))
 
     def storeServerInfo(self, serverInfoObject):
-        """
-        Saves the provided ThreddsServerInfo object into the underlying
+        """Saves the provided ThreddsServerInfo object into the underlying
         QSettings object for this application.
 
         It is stored under the namespace self.ThreddsServerGroup.
@@ -87,8 +85,7 @@ class ServerStorageManager(QDialog):
         self.reloadTable()
 
     def deleteServerInfo(self, serverName):
-        """
-        Deletes the ThreddsServerInfo object with the given name from
+        """Deletes the ThreddsServerInfo object with the given name from
         the underlying settings.
 
         :param    serverName: The name of the server we have to delete.
@@ -100,8 +97,7 @@ class ServerStorageManager(QDialog):
         settings.endGroup()
 
     def initializeDefaultServers(self):
-        """
-        Guarantees that this object has access to, at least, some default
+        """Guarantees that this object has access to, at least, some default
         servers pre-configured in them. Will also restore their properties if they
         have previously been changed.
         """
@@ -110,28 +106,29 @@ class ServerStorageManager(QDialog):
         # settings.beginGroup(self.ThreddsServerGroup)
         # for setting in settings.allKeys():
         #     settings.remove(setting)
-        defaultServers.append(ThreddsServerInfoObject('NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'))
-        defaultServers.append(ThreddsServerInfoObject('NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'))
-        defaultServers.append(ThreddsServerInfoObject('Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/'))
-        for srv in defaultServers:
-            self._saveServerInSettings(srv)
 
-    def _saveServerInSettings(self, serverInfoObject):
-        """
-        Stores an object containing the required information to access a thredds
+        defaultServers.append(['NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'])
+        defaultServers.append(['NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'])
+        defaultServers.append(['Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/'])
+
+        for srv in defaultServers:
+            self._saveServerInSettings(srv[0], srv[1])
+
+    def _saveServerInSettings(self, serverName, serverURL):
+        """Stores the required information to access a thredds
         server in a settings object for persistence.
 
-        :param    serverInfoObject    The object which contains all the information
-                                      we want to store from the server (name, URL..)
-        :type     serverInfoObject    ThreddsServerInfoObject
+        :param serverName: the name of the server we want to store
+        :type  serverName: str
+
+        :param serverURL:  the URL of the server we want to store
+        :type  serverName: str
         """
         settings = QSettings()
-        settings.setValue(self.ThreddsServerGroup+r'/'+
-                          serverInfoObject.getName(), serverInfoObject)
+        settings.setValue(self.ThreddsServerGroup+r'/'+serverName, serverURL)
 
     def retrieveAllStoredServerInfo(self):
-        """
-        Retrieves a list of ThreddsServerInfo objects stored in the
+        """Retrieves a list of ThreddsServerInfo objects stored in the
         underlying settings object for this application.
 
         Uses the Group definition "self.ThreddsServerGroup" to know
@@ -148,9 +145,10 @@ class ServerStorageManager(QDialog):
         settings = QSettings()
         settings.beginGroup(self.ThreddsServerGroup)
         for element in settings.childKeys():
-            srv = settings.value(element, None)
-            if srv is not None:
-                serverList.append(srv);
+            srv = settings.value(element)
+            srv_info = ThreddsServerInfoObject(element, srv)
+            if srv_info:
+                serverList.append(srv_info);
 
         settings.endGroup()
         return serverList
@@ -201,7 +199,7 @@ class ServerStorageManager(QDialog):
 
         else:
             serverInfo = ThreddsServerInfoObject(inServerDetails[0], inServerDetails[1])
-            self._saveServerInSettings(serverInfo)
+            self._saveServerInSettings(serverInfo.getName(), serverInfo.getURL())
             self.addServerWindowManager.close()
             self.addServerWindowManager = None
             self.reloadTable()
