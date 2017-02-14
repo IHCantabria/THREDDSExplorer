@@ -9,6 +9,8 @@ from urllib2 import URLError
 from httplib import HTTPException
 from qgis.core import QgsMessageLog
 from PyQt4.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt4 import QtGui
+from THREDDSExplorer import NotAuthorized
 
 from THREDDSExplorer.libvisor import ThreddsMapperGeneric as TMR
 from THREDDSExplorer.libvisor.providersmanagers.wms import WMSParser as WMS
@@ -48,6 +50,8 @@ class VisorController(QObject):
 
     standardMessage = pyqtSignal(str)
     errorMessage = pyqtSignal(str)
+    
+    threddsCredentials = {'user':'ihcantabria', 'password': 'AEMETHIRLAMHRUSER161116'}
 
     def __init__(self):
         super(VisorController, self).__init__()
@@ -232,9 +236,17 @@ class VisorController(QObject):
                 return WMSreader.getMapInfo()
             else:
                 return None
-        except (HTTPException,urllib2.URLError, timeout):
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-            return None
+        except (HTTPException,urllib2.URLError, timeout) as e:
+            if (e.code == 401):
+                self.notAuthorized()
+                    
+    def notAuthorized(self):
+        notAuth = NotAuthorized.NotAuthorized()
+        if notAuth.exec_() == QtGui.QDialog.Accepted:
+            QgsMessageLog.logMessage(traceback.format_exc(), "Protected dataset, not authorized", QgsMessageLog.CRITICAL )
+            self.standardMessage.emit("Protected dataset, not authorized")
+
+                
 
     def _retrieveWMSMapImage(self, threddsMapObject, layerName, styleName, timeRequested, boundingBox):
         """Async call to retrieve the image from server.
@@ -374,7 +386,7 @@ class VisorController(QObject):
                 return WCSreader.getAvailableCoverages()
             else:
                 return None
-        except (HTTPException,urllib2.URLError, timeout):
+        except (HTTPException,urllib2.URLError, timeout) as e:
             QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
             return None
 
