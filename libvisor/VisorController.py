@@ -50,8 +50,6 @@ class VisorController(QObject):
 
     standardMessage = pyqtSignal(str)
     errorMessage = pyqtSignal(str)
-    
-    threddsCredentials = {'user':'ihcantabria', 'password': 'AEMETHIRLAMHRUSER161116'}
 
     def __init__(self):
         super(VisorController, self).__init__()
