@@ -3,12 +3,12 @@ Created on 27 de ene. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtGui import QWidget
-from PyQt4.QtCore import pyqtSignal, pyqtSlot, SIGNAL
-from THREDDSExplorer.libvisor.providersmanagers.wms.WMSParser import WMSparser
-from THREDDSExplorer.libvisor.animation import Animation_add_wms_layer
-from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
-from urllib2 import HTTPError, URLError
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Signal
+from ..providersmanagers.wms.WMSParser import WMSparser
+from . import Animation_add_wms_layer
+from .AnimationLayer import AnimationLayer
+from urllib.request import HTTPError, URLError
 from _socket import timeout
 
 
@@ -32,10 +32,12 @@ class AnimationWMSLayerManager(QWidget):
         
         self.mapObject = mapObject
         self.loadLayerList()
-        self.connect(self.dialog.layerSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onSelectedLayerChanged)
-        self.connect(self.dialog.graphicSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onWMSGraphicSelectorSelectorItemChanged)
-        self.connect(self.dialog.beginTimeSelector, SIGNAL("currentIndexChanged(int)"), self._onSelectedBeginTime)
-        
+        #self.connect(self.dialog.layerSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onSelectedLayerChanged)
+        #self.connect(self.dialog.graphicSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onWMSGraphicSelectorSelectorItemChanged)
+        #self.connect(self.dialog.beginTimeSelector, SIGNAL("currentIndexChanged(int)"), self._onSelectedBeginTime)
+        self.dialog.layerSelector.currentIndexChanged[str].connect(self._onSelectedLayerChanged)
+        self.dialog.graphicSelector.currentIndexChanged[str].connect(self._onWMSGraphicSelectorSelectorItemChanged)
+        self.dialog.beginTimeSelector.currentIndexChanged[int].connect(self._onSelectedBeginTime)
         
         self.dialog.buttonAddLayer.clicked.connect(self._onAcceptClicked)
         

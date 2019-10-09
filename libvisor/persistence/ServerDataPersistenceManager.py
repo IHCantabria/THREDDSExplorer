@@ -5,18 +5,12 @@ Created on 2016-01-04
 @author: IHC
 """
 
-from PyQt4.QtGui import QDialog
-from PyQt4.QtGui import QMessageBox
-from PyQt4.QtGui import QTableWidgetItem
-from PyQt4.QtGui import QAbstractItemView
+from PyQt5.QtWidgets import QDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtCore import pyqtSlot, QSettings, pyqtSignal
 
-from PyQt4.QtCore import pyqtSlot
-from PyQt4.QtCore import QSettings
-from PyQt4.QtCore import pyqtSignal
-
-import THREDDSExplorer.libvisor.persistence.Server_Manager_UI as ManagerUI
-from THREDDSExplorer.libvisor.persistence.AddServerWindowManager import AddServerWindowManager as addServerManager
-from THREDDSExplorer.libvisor.persistence.ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
+from .Server_Manager_UI import Ui_serverListDialog
+from .AddServerWindowManager import AddServerWindowManager
+from .ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
 
 class ServerStorageManager(QDialog):
     """Handles persistence of preferences for this application,
@@ -49,7 +43,7 @@ class ServerStorageManager(QDialog):
         self.availableServers = []
         self.initializeDefaultServers()
 
-        self.serverListDialog = ManagerUI.Ui_serverListDialog()
+        self.serverListDialog = Ui_serverListDialog()
         self.serverListDialog.setupUi(self)
         self.serverListDialog.buttonLoadData.clicked.connect(self._onbuttonLoadDataClick)
         self.serverListDialog.buttonAdd.clicked.connect(self._onbuttonAddClick)
@@ -108,7 +102,7 @@ class ServerStorageManager(QDialog):
         defaults = (
                 ('NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'),
                 ('NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'),
-                ('Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/'),
+                ('Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/')
         )
         for name,url in defaults:
             self._saveServerInSettings(ThreddsServerInfoObject(name, url))
@@ -167,7 +161,7 @@ class ServerStorageManager(QDialog):
             self.serverSelected.emit(self.availableServers[selectedRowNumber])
 
     def _onbuttonAddClick(self):
-        self.addServerWindowManager = addServerManager()
+        self.addServerWindowManager = AddServerWindowManager()
         self.addServerWindowManager.newServerSubmitted.connect(self._onAttemptToAddNewServer)
         self.addServerWindowManager.show()
 

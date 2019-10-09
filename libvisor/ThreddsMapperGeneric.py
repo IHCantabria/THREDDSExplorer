@@ -1,13 +1,15 @@
 # -*- coding=utf8 -*-
-import urllib2
 import xml.etree.ElementTree as ET
 import threading
 import time
-from THREDDSExplorer.libvisor.utilities.Utilities import combineURLS
-from PyQt4.QtCore import pyqtSignal, QObject
-from httplib import HTTPException
-from urllib2 import URLError
+from ..libvisor.utilities.Utilities import combineURLS
+from PyQt5.QtCore import pyqtSignal, QObject
+from http.client import HTTPException
+from urllib.request import URLError
+import urllib.request
 from qgis.core import QgsMessageLog
+from qgis.core import *
+from qgis.utils import iface
 import traceback
 
 class Map(object):
@@ -244,7 +246,7 @@ class ThreddsCatalogInfo(QObject):
         :type     depth:    int
         """
         try:
-            page = urllib2.urlopen(self.threddsMainCatalog+r'/'+self.threddsCatalogFileName,
+            page = urllib.request.urlopen(self.threddsMainCatalog+r'/'+self.threddsCatalogFileName,
                                 timeout=self.NetworkRequestTimeout)
         except (HTTPException, URLError, ValueError) as e:
             QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
@@ -270,13 +272,13 @@ class ThreddsCatalogInfo(QObject):
             aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
             while(len(aliveThreads) > self.maxDownloadThreadsPerSet): #We limit the amount of concurrent threads.
                 aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
-                time.sleep(0.5)
+                time.sleep(0.1)
             item.start()
 
         #Workaround. For some reasons, joining the threads cause QGIS to
         #break and die.
         while len(aliveThreads) > 0:
-            time.sleep(0.5)
+            time.sleep(0.1)
             aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
 
         asyncProcesses = None
@@ -324,10 +326,11 @@ class ThreddsCatalogInfo(QObject):
         url = self.translateCatalogURL(dataSet.getMainCatalogURL())
 
         try:
-            page = urllib2.urlopen(url, timeout=self.NetworkRequestTimeout)
+            page = urllib.request.urlopen(url, timeout=self.NetworkRequestTimeout)
         except Exception as e:
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-            raise e
+            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage("THREDDS Explorer", str(e), level=Qgis.Critical)
+            #raise e
 
         string = page.read()
         xml = ET.fromstring(string)

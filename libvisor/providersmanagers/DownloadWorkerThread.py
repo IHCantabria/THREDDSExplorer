@@ -3,7 +3,7 @@ Created on 13 de abr. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtCore import QObject
+from PyQt5.QtCore import QObject
 
 class DownloadWorkerThread(QObject):
     '''

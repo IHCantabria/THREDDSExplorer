@@ -12,16 +12,16 @@ from datetime import timedelta
 
 # QGIS /PyQt libs:
 from qgis.utils import iface
-from qgis.core import QgsMessageLog
-from PyQt4.QtCore import QObject, QTimer, pyqtSignal, pyqtSlot, Qt
+from qgis.core import QgsMessageLog, QgsProject, Qgis
+from PyQt5.QtCore import QObject, QTimer, pyqtSignal, pyqtSlot, Qt
 
 # Our libs:
-from THREDDSExplorer.libvisor.animation.Animation2 import AnimationData
-from THREDDSExplorer.libvisor.animation import AnimationOtherLayerManager
-from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
-from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
-from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
-from THREDDSExplorer.libvisor.providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
+from .Animation2 import AnimationData
+from . import AnimationOtherLayerManager
+from .AnimationLayer import AnimationLayer
+from ..utilities.LayerLegendGroupifier import LayerGroupifier
+from ..providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
+from ..providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
 
 class Controller(QObject):
     """Manages all operations required to handle animation operations.
@@ -150,7 +150,9 @@ class Controller(QObject):
                 layer = animation.getFrameByTime(self.nextFrame,
                                                   self.timeDeviationTolerance)
                 try:
-                    iface.legendInterface().setLayerVisible(layer, True)
+                    #iface.legendInterface().setLayerVisible(layer, True)
+                    QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
+                    #QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
                 except RuntimeError:
                     #Will happen if the animator attempts to set as visible
                     #a no longer existing layer (i.e. if the user removes
@@ -161,7 +163,8 @@ class Controller(QObject):
                     QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
                 self.framesShown.append(layer)
             except KeyError:
-                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage("THREDDS Explorer", "Connection error.", level=Qgis.Critical)
                 continue
 
         #print("MAP SEARCH FINISHED")

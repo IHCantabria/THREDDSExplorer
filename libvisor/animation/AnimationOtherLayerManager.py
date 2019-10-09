@@ -3,9 +3,9 @@ Created on 22 de feb. de 2016
 
 @author: IHC
 '''
-from THREDDSExplorer.libvisor.animation import Animation_add_others
-from PyQt4.QtGui import QWidget, QPushButton
-from PyQt4.QtCore import pyqtSlot, pyqtSignal
+from . import Animation_add_others
+from PyQt5.QtWidgets import QWidget, QPushButton
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 class AnimationOtherLayerManager(QWidget):
     '''

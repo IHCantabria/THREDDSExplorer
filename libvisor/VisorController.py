@@ -1,23 +1,26 @@
 # -*- coding:utf8 -*-
 
-import urllib2
 import tempfile
 import threading
 import traceback
+from urllib.request import urlopen
+from urllib.error import URLError
+import urllib.request
 from _socket import timeout
-from urllib2 import URLError
-from httplib import HTTPException
+from http.client import HTTPException
 from qgis.core import QgsMessageLog
-from PyQt4.QtCore import pyqtSlot, pyqtSignal, QObject
-from PyQt4 import QtGui
-from THREDDSExplorer import NotAuthorized
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5 import QtWidgets
+from .. import NotAuthorized
+from qgis.utils import iface
+from qgis.core import *
 
-from THREDDSExplorer.libvisor import ThreddsMapperGeneric as TMR
-from THREDDSExplorer.libvisor.providersmanagers.wms import WMSParser as WMS
-from THREDDSExplorer.libvisor.providersmanagers.wcs import WCSParser as WCS
-from THREDDSExplorer.libvisor.persistence.ServerDataPersistenceManager import ServerStorageManager
-from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
-from THREDDSExplorer.libvisor.providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
+from . import ThreddsMapperGeneric as TMR
+from .providersmanagers.wms import WMSParser as WMS
+from .providersmanagers.wcs import WCSParser as WCS
+from .persistence.ServerDataPersistenceManager import ServerStorageManager
+from .providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
+from .providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
 
 class VisorController(QObject):
     """Links UI and data from Visor_WMS project.
@@ -207,7 +210,7 @@ class VisorController(QObject):
         else:
             try:
                 #print("emitting from controller... "+str(mapInfoList.values()[0]))
-                self.mapInfoRetrieved.emit(mapInfoList.values()[0])
+                self.mapInfoRetrieved.emit(list(mapInfoList.values())[0])
             except IndexError:
                 QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
                 return None
@@ -234,13 +237,13 @@ class VisorController(QObject):
                 return WMSreader.getMapInfo()
             else:
                 return None
-        except (HTTPException,urllib2.URLError, timeout) as e:
+        except (HTTPException,urllib.error.URLError, timeout) as e:
             if (e.code == 401):
                 self.notAuthorized()
                     
     def notAuthorized(self):
         notAuth = NotAuthorized.NotAuthorized()
-        if notAuth.exec_() == QtGui.QDialog.Accepted:
+        if notAuth.exec_() == QtWidgets.QDialog.Accepted:
             QgsMessageLog.logMessage(traceback.format_exc(), "Protected dataset, not authorized", QgsMessageLog.CRITICAL )
             self.standardMessage.emit("Protected dataset, not authorized")
 
@@ -384,8 +387,9 @@ class VisorController(QObject):
                 return WCSreader.getAvailableCoverages()
             else:
                 return None
-        except (HTTPException,urllib2.URLError, timeout) as e:
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+        except (HTTPException, URLError, timeout) as e:
+            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage("THREDDS Explorer", str(e), level=Qgis.Critical)
             return None
 
     @pyqtSlot(dict, WMSDownloadWorkerThread)
@@ -395,7 +399,7 @@ class VisorController(QObject):
         :type  layerDictionary: dict {time:layer}
         """
         try:
-            self.batchDownloadFinished.emit(layerDictionary.values(), workerObject.getJobName())
+            self.batchDownloadFinished.emit(list(layerDictionary.values()), workerObject.getJobName())
         except KeyError:
             QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
             # Might happen if a thread is cancelled in the last frame download,

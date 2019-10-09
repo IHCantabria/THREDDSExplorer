@@ -5,7 +5,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -14,12 +14,12 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -27,9 +27,9 @@ class Ui_Dialog(object):
         Dialog.resize(265, 126)
         Dialog.setMinimumSize(QtCore.QSize(265, 99))
         Dialog.setMaximumSize(QtCore.QSize(265, 999))
-        self.verticalLayout = QtGui.QVBoxLayout(Dialog)
+        self.verticalLayout = QtWidgets.QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.progressInfoLabel = QtGui.QLabel(Dialog)
+        self.progressInfoLabel = QtWidgets.QLabel(Dialog)
         self.progressInfoLabel.setObjectName(_fromUtf8("progressInfoLabel"))
         self.verticalLayout.addWidget(self.progressInfoLabel)
 

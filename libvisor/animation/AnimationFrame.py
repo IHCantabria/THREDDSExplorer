@@ -9,21 +9,20 @@ import time
 import threading
 import traceback
 from _socket import timeout
-from urllib2 import URLError
+from urllib.request import URLError
 from datetime import timedelta
-from httplib import HTTPException
+from http.client import HTTPException
 
 # QGIS / PyQt libs:
 from qgis.utils import iface
-from PyQt4.QtCore import QTime
-from PyQt4.QtGui import QMessageBox
-from qgis.core import QgsMessageLog
-from PyQt4.Qt import pyqtSlot, pyqtSignal, Qt
-from PyQt4.QtGui import QTableWidgetItem, QDockWidget
+from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
+from qgis.core import QgsMessageLog, Qgis
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QDockWidget
+from PyQt5.Qt import Qt
 
 # Our libs:
-from THREDDSExplorer.libvisor.animation.AnimationController2 import Controller
-from THREDDSExplorer.libvisor.animation import AnimationWCSManager, AnimationWMSManager, Animation_menu
+from .AnimationController2 import Controller
+from . import AnimationWCSManager, AnimationWMSManager, Animation_menu
 
 class AnimationFrame(QDockWidget):
     """Animation widget UI manager.
@@ -35,7 +34,7 @@ class AnimationFrame(QDockWidget):
     """
     lock = threading.RLock()
     errorSignal = pyqtSignal(str) #We will delegate any error reporting to the class which uses this widget.
-
+    
     def __init__(self, parent = None):
         super(AnimationFrame, self).__init__(parent)
         self.parent = parent
@@ -66,11 +65,11 @@ class AnimationFrame(QDockWidget):
         self.animationUI.buttonLoad.clicked.connect(self.prepareAnimation)
         self.layerInfoList = []
         self.animationUI.frameRateSpinbox.valueChanged.connect(self._newFrameRateSelected)
-        self.animationUI.timeFrameVariation.timeChanged.connect(self._timeVariationChanged)
-        self.animationUI.daysFrameVariation.valueChanged.connect(self._timeVariationChanged)
+        #self.animationUI.timeFrameVariation.timeChanged.connect(self._timeVariationChanged)
+        #self.animationUI.daysFrameVariation.valueChanged.connect(self._timeVariationChanged)
 
-        self.animationUI.timeTolerance.timeChanged.connect(self._toleranceChanged)
-        self.animationUI.daysTolerance.valueChanged.connect(self._toleranceChanged)
+        #self.animationUI.timeTolerance.timeChanged.connect(self._toleranceChanged)
+        #self.animationUI.daysTolerance.valueChanged.connect(self._toleranceChanged)
 
         self.initController()
         self.animationUI.timeFrameVariation.setTime(QTime(1, 0, 0))
@@ -133,8 +132,9 @@ class AnimationFrame(QDockWidget):
                 self.addLayerMenu.animationLayerCreated.connect(self._addLayerToAnimation)
                 self.addLayerMenu.show()
             except (HTTPException, URLError, timeout):
-                self.onError("Connection error: Server or resource unreachable.")
-                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                #self.onError("Connection error: Server or resource unreachable.")
+                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage("THREDDS Explorer", "Connection error: Server or resource unreachable.", level=Qgis.Critical)
         else:
             self.onError("A map must first be selected\nin THREDDS Explorer catalog view.")
 
@@ -264,8 +264,9 @@ class AnimationFrame(QDockWidget):
             self.animationUI.progressBar.setMaximum(self.controller.getMaxProgressValue())
             self.controller.setFrameRate(self.animationUI.frameRateSpinbox.value())
         except AttributeError as e:
-            self.onError(str(e))
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            #self.onError(str(e))
+            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage("THREDDS Explorer", "Invalid data provided.", level=Qgis.Critical)
 
     def play(self):
         self.animationUI.labelInfo.show()

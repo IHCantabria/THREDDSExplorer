@@ -3,9 +3,9 @@ Created on 12 de ene. de 2016
 
 @author: IHC
 '''
-import THREDDSExplorer.libvisor.persistence.Server_Manager_Add_Server as AddServerUI
-from PyQt4.QtCore import pyqtSignal
-from PyQt4.QtGui import QDialog
+from . import Server_Manager_Add_Server as AddServerUI
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QDialog
 
 class AddServerWindowManager(QDialog):
     '''
