@@ -3,10 +3,10 @@ Created on 28 de mar. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtCore import pyqtSignal
-from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSParser import WCSparser
+from PyQt5.QtCore import pyqtSignal
+from .WCSParser import WCSparser
 from datetime import datetime
-from THREDDSExplorer.libvisor.providersmanagers.DownloadWorkerThread import DownloadWorkerThread
+from ..DownloadWorkerThread import DownloadWorkerThread
 
 
 class WCSDownloadWorkerThread(DownloadWorkerThread):

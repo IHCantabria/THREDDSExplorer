@@ -3,12 +3,12 @@ Created on 28 de mar. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtCore import pyqtSignal, Qt
-from THREDDSExplorer.libvisor.providersmanagers.wms.WMSParser import WMSparser
+from PyQt5.QtCore import pyqtSignal, Qt
+from .WMSParser import WMSparser
 from datetime import datetime
-from THREDDSExplorer.libvisor.animation.Animation2 import AnimationData
-from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
-from THREDDSExplorer.libvisor.providersmanagers.DownloadWorkerThread import DownloadWorkerThread
+from ...animation.Animation2 import AnimationData
+from ...animation.AnimationLayer import AnimationLayer
+from ..DownloadWorkerThread import DownloadWorkerThread
 
 class WMSDownloadWorkerThread(DownloadWorkerThread):
     """

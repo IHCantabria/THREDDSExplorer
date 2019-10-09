@@ -4,18 +4,19 @@
 import json
 import time
 import uuid
-import urllib2
+from urllib.request import urlopen
+import urllib.request
 import threading
 from threading import RLock
 import xml.etree.ElementTree as ET
 
 # QGIS / PyQt libs:
 from qgis.core import QgsRasterLayer
-from PyQt4.Qt import pyqtSignal, QObject
+from PyQt5.Qt import pyqtSignal, QObject
 
 # Our libs:
-from THREDDSExplorer.libvisor.providersmanagers.wms import WmsLayerInfo
-from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
+from . import WmsLayerInfo
+from ..BoundingBoxInfo import BoundingBox
 
 class WMSparser(QObject):
     """Parsers to make objects from WMS service based maps.
@@ -72,7 +73,7 @@ class WMSparser(QObject):
             '&BBOX={bbox}'
         )
         
-        XML = urllib2.urlopen(urlXML).read()
+        XML = urllib.request.urlopen(urlXML).read()
         self.tree = ET.fromstring(XML)
         self.mapInfo = None
         self.mapLayer = None
@@ -257,7 +258,7 @@ class WMSparser(QObject):
     
     def _getRangeValuesFromJSONPath(self, jsonPath):
         #print("CALCULATING RANGE: "+jsonPath+" at system time "+str(datetime.datetime.now()))
-        jsonRawData = urllib2.urlopen(jsonPath)
+        jsonRawData = urllib.request.urlopen(jsonPath)
         jsonObject = json.load(jsonRawData)
         newMin = jsonObject["min"]
         newMax = jsonObject["max"]

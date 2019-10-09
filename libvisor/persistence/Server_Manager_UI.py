@@ -5,7 +5,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -14,12 +14,12 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 class Ui_serverListDialog(object):
     def setupUi(self, serverListDialog):
@@ -27,34 +27,34 @@ class Ui_serverListDialog(object):
         serverListDialog.setWindowModality(QtCore.Qt.ApplicationModal)
         serverListDialog.resize(499, 267)
         serverListDialog.setMinimumSize(QtCore.QSize(499, 267))
-        self.gridLayout = QtGui.QGridLayout(serverListDialog)
+        self.gridLayout = QtWidgets.QGridLayout(serverListDialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.baseVerticalLayout = QtGui.QVBoxLayout()
+        self.baseVerticalLayout = QtWidgets.QVBoxLayout()
         self.baseVerticalLayout.setObjectName(_fromUtf8("baseVerticalLayout"))
-        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.tableWidget = QtGui.QTableWidget(serverListDialog)
+        self.tableWidget = QtWidgets.QTableWidget(serverListDialog)
         self.tableWidget.setAlternatingRowColors(True)
-        self.tableWidget.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
         self.horizontalLayout.addWidget(self.tableWidget)
-        self.buttonLayout = QtGui.QVBoxLayout()
+        self.buttonLayout = QtWidgets.QVBoxLayout()
         self.buttonLayout.setObjectName(_fromUtf8("buttonLayout"))
-        self.buttonLoadData = QtGui.QPushButton(serverListDialog)
+        self.buttonLoadData = QtWidgets.QPushButton(serverListDialog)
         self.buttonLoadData.setMinimumSize(QtCore.QSize(0, 0))
         self.buttonLoadData.setObjectName(_fromUtf8("buttonLoadData"))
         self.buttonLayout.addWidget(self.buttonLoadData)
-        self.buttonAdd = QtGui.QPushButton(serverListDialog)
+        self.buttonAdd = QtWidgets.QPushButton(serverListDialog)
         self.buttonAdd.setCheckable(False)
         self.buttonAdd.setObjectName(_fromUtf8("buttonAdd"))
         self.buttonLayout.addWidget(self.buttonAdd)
-        self.buttonRemove = QtGui.QPushButton(serverListDialog)
+        self.buttonRemove = QtWidgets.QPushButton(serverListDialog)
         self.buttonRemove.setObjectName(_fromUtf8("buttonRemove"))
         self.buttonLayout.addWidget(self.buttonRemove)
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.buttonLayout.addItem(spacerItem)
         self.horizontalLayout.addLayout(self.buttonLayout)
         self.baseVerticalLayout.addLayout(self.horizontalLayout)

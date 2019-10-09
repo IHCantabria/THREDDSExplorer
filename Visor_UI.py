@@ -23,24 +23,24 @@ import sys
 import traceback
 from threading import RLock
 
-from PyQt4 import uic
-from PyQt4 import QtGui
-from PyQt4.QtCore import pyqtSlot, SIGNAL, Qt
-from PyQt4.QtGui import QMessageBox, QStatusBar
+from PyQt5 import uic
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSlot, Signal, Qt
+from PyQt5.QtWidgets import QMessageBox, QStatusBar
 
 from qgis.utils import iface
 from qgis.core import QgsMessageLog
-from qgis.core import QgsLayerTreeGroup, QgsMapLayerRegistry
+from qgis.core import QgsLayerTreeGroup, QgsProject, Qgis
 
-from THREDDSExplorer.libvisor import VisorController
-from THREDDSExplorer.libvisor.animation.AnimationFrame import AnimationFrame
-from THREDDSExplorer.libvisor.persistence import ServerDataPersistenceManager
-from THREDDSExplorer.libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
-from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
+from .libvisor import VisorController
+from .libvisor.animation.AnimationFrame import AnimationFrame
+from .libvisor.persistence import ServerDataPersistenceManager
+from .libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
+from .libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
 
-class Visor(QtGui.QDockWidget, FORM_CLASS):
+class Visor(QtWidgets.QDockWidget, FORM_CLASS):
     """
     UI manager for the visor.
 
@@ -70,26 +70,32 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         self.controller.batchDownloadFinished.connect(self.createLayerGroup)
 
         self.showEmptyDatasetNodes = showEmptyDatasetNodes # TODO: self-explanatory...
-        self.combo_dataset_list.currentIndexChanged.connect(self._onDataSetItemChanged)
+        self.combo_dataset_list.currentIndexChanged[str].connect(self._onDataSetItemChanged)
         self.tree_widget.itemClicked.connect(self._onMapTreeWidgetItemClicked)
         self.tree_widget.itemExpanded.connect(self._onMapTreeWidgetItemExpanded)
 
         self.tabWidget.currentChanged.connect(self.runWhenTabChange)
 
-        self.connect(self.combo_wcs_coverage, SIGNAL("currentIndexChanged(const QString&)"),
-                self._onCoverageSelectorItemChanged)
-        self.connect(self.combo_wms_layer, SIGNAL("currentIndexChanged(const QString&)"),
-                self._onWMSLayerSelectorItemChanged)
-        self.connect(self.combo_wms_style_type, SIGNAL("currentIndexChanged(const QString&)"),
-                self._onWMSStyleTypeSelectorItemChanged)
-        self.connect(self.combo_wms_time, SIGNAL("currentIndexChanged(int)"), self._onWMSFirstTimeChanged)
-        self.connect(self.combo_wcs_time, SIGNAL("currentIndexChanged(int)"), self._onWCSFirstTimeChanged)
-
+#         self.connect(self.combo_wcs_coverage, Signal("currentIndexChanged(const QString&)"),
+#                 self._onCoverageSelectorItemChanged)
+#         self.connect(self.combo_wms_layer, Signal("currentIndexChanged(const QString&)"),
+#                 self._onWMSLayerSelectorItemChanged)
+#         self.connect(self.combo_wms_style_type, Signal("currentIndexChanged(const QString&)"),
+#                 self._onWMSStyleTypeSelectorItemChanged)
+#         self.connect(self.combo_wms_time, Signal("currentIndexChanged(int)"), self._onWMSFirstTimeChanged)
+#         self.connect(self.combo_wcs_time, Signal("currentIndexChanged(int)"), self._onWCSFirstTimeChanged)
+        
+        self.combo_wcs_coverage.currentIndexChanged[str].connect(self._onCoverageSelectorItemChanged)
+        self.combo_wms_layer.currentIndexChanged[str].connect(self._onWMSLayerSelectorItemChanged)
+        self.combo_wms_style_type.currentIndexChanged[str].connect(self._onWMSStyleTypeSelectorItemChanged)
+        self.combo_wms_time.currentIndexChanged[int].connect(self._onWMSFirstTimeChanged)
+        self.combo_wcs_time.currentIndexChanged[int].connect(self._onWCSFirstTimeChanged)
+        
         self.button_req_map.clicked.connect(self._onbuttonReqMapClicked)
         #self.actionToggleAlwaysOnTop.toggled.connect(self._onAlwaysOnTopPrefsChanged)
         self.buttonManageServers.clicked.connect(self._onManageServersRequested)
         self.button_req_animation.clicked.connect(self.toggleAnimationMenu)
-
+        
         # We add a status bar to this QDockWidget:
         self.statusbar = QStatusBar()
         self.gridLayout.addWidget(self.statusbar)
@@ -157,7 +163,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     message += "under 2.0 are not guaranteed to work when\n"
                     message += "attempting to load WCS Layers.\nPlease update GDAL."
 
-                    reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
+                    reply = QtWidgets.QMessageBox.question(self, 'GDAL: Unsupported version found',
                             (message), "Close", "Don't show again")
 
                     # If requested to, record setting not to show warning again:
@@ -171,7 +177,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                 message += "attempting to load WCS Layers. If you have any issues,\n"
                 message += "please update GDAL."
 
-                reply = QtGui.QMessageBox.question(self, 'GDAL: Unsupported version found',
+                reply = QtWidgets.QMessageBox.question(self, 'GDAL: Unsupported version found',
                         (message), "Close", "Don't show again")
 
                 # If requested to, record setting not to show warning again:
@@ -227,7 +233,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         """Will change the alwaysontop window modifier to suit the user selection."""
 
         self.setWindowFlags(self.windowFlags() ^ Qt.WindowStaysOnTopHint)
-        QtGui.QMainWindow.show(self)
+        QtWidgets.QMainWindow.show(self)
 
     @pyqtSlot(list, str)
     def onNewDatasetsAvailable(self, inDataSets, serverName):
@@ -292,7 +298,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
             return #If no dataset is available to be shown, we will create no tree.
 
         rootItem = self.tree_widget.invisibleRootItem();
-        newItem = QtGui.QTreeWidgetItem(rootItem, [self.datasetInUse.getName()])
+        newItem = QtWidgets.QTreeWidgetItem(rootItem, [self.datasetInUse.getName()])
         rootItem.addChild(self._createHierarchy(self.datasetInUse, newItem))
 
     def _createHierarchy(self, dataSet, treeItemParent):
@@ -321,13 +327,13 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                 if mapElement.getName() in elementsAlreadyInTreeItemParent:
                     continue
                 else:
-                    newItem = QtGui.QTreeWidgetItem(treeItemParent, [mapElement.getName()])
+                    newItem = QtWidgets.QTreeWidgetItem(treeItemParent, [mapElement.getName()])
                     treeItemParent.addChild(newItem)
 
             subSets = dataSet.getSubSets()
             if len(subSets) == 0:
                 #We add a dummy element so the element open icon is created..
-                newItem = QtGui.QTreeWidgetItem(treeItemParent)
+                newItem = QtWidgets.QTreeWidgetItem(treeItemParent)
                 newItem.setText(0,"No subsets found")
                 treeItemParent.addChild(newItem)
             else:
@@ -337,7 +343,7 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     #create a new one and append it.
                     itemList = ([x for x in itemsAlreadyAddedToElement if x.text(0) == dataset.getName()])
                     if itemList is None or len(itemList) == 0:
-                        item = QtGui.QTreeWidgetItem(treeItemParent, [dataset.getName()])
+                        item = QtWidgets.QTreeWidgetItem(treeItemParent, [dataset.getName()])
                         treeItemParent.addChild(self._createHierarchy(dataset, item))
                     else:
                         item = itemList[0]
@@ -524,8 +530,9 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     except IndexError:
                         pass
             except Exception as exc:
-                self.postInformationMessageToUser("There was an error retrieving the WCS data.")
-                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                #self.postInformationMessageToUser("There was an error retrieving the WCS data.")
+                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage("THREDDS Explorer", "There was an error retrieving the WCS data.", level=Qgis.Critical)
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WMS):
             try:
                 selectedBeginTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time.currentText())
@@ -562,16 +569,13 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
                     boundingBoxToDownload.setWest(west)
                     boundingBoxToDownload.setNorth(north)
                     boundingBoxToDownload.setSouth(south)
-                    self.controller.asyncFetchWMSImageFile(self.currentMap,
-                                                            self.combo_wms_layer.currentText(),
-                                                            style,
-                                                            self.wmsAvailableTimes[selectedBeginTimeIndex
-                                                                                   :selectedFinishTimeIndex],
-                                                            boundingBox = boundingBoxToDownload)
+                    self.controller.asyncFetchWMSImageFile(self.currentMap, self.combo_wms_layer.currentText(), style, self.wmsAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex], boundingBox = boundingBoxToDownload)
             except Exception as exc:
                 print(exc)
-                self.postInformationMessageToUser("There was an error retrieving the WMS data.")
-                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                #self.postInformationMessageToUser("There was an error retrieving the WMS data.")
+                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage("THREDDS Explorer", "There was an error retrieving the WMS data.", level=Qgis.Critical)
+
 
     @pyqtSlot(list, str)
     def createLayerGroup(self, layerList, groupName):
@@ -597,7 +601,8 @@ class Visor(QtGui.QDockWidget, FORM_CLASS):
         :type  layerList: [QgsLayer]
         """
         if (layerList[0]).isValid():
-            iface.legendInterface().setLayerVisible(layerList[0], True)
+            #iface.legendInterface().setLayerVisible(layerList[0], True)
+            QgsProject.instance().layerTreeRoot().findLayer(layerList[0].id()).setItemVisibilityChecked(True)
         else:
             self.postInformationMessageToUser("There was a problem showing a layer.")
 

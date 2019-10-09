@@ -3,14 +3,14 @@ Created on 27 de ene. de 2016
 
 @author: IHC
 '''
-from PyQt4.QtGui import QMessageBox, QWidget
-from PyQt4.QtCore import pyqtSignal, pyqtSlot, SIGNAL
-from THREDDSExplorer.libvisor.providersmanagers.wcs.WCSParser import WCSparser
-from THREDDSExplorer.libvisor.animation import Animation_add_wcs_layer
-from THREDDSExplorer.libvisor.animation.AnimationLayer import AnimationLayer
-from urllib2 import HTTPError, URLError
+from PyQt5.QtWidgets import QMessageBox, QWidget
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Signal
+from ..providersmanagers.wcs.WCSParser import WCSparser
+from . import Animation_add_wcs_layer
+from .AnimationLayer import AnimationLayer
+from urllib.request import HTTPError, URLError
 from _socket import timeout
-from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
+from ..providersmanagers.BoundingBoxInfo import BoundingBox
 
 
 class AnimationWCSLayerManager(QWidget):
@@ -36,8 +36,10 @@ class AnimationWCSLayerManager(QWidget):
         
         self.mapObject = mapObject
         self.loadLayerList()
-        self.connect(self.dialog.layerSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onSelectedCoverageChanged)
-        self.connect(self.dialog.beginTimeSelector, SIGNAL("currentIndexChanged(int)"), self._onSelectedBeginTime)
+        #self.connect(self.dialog.layerSelector, SIGNAL("currentIndexChanged(const QString&)"), self._onSelectedCoverageChanged)
+        #self.connect(self.dialog.beginTimeSelector, SIGNAL("currentIndexChanged(int)"), self._onSelectedBeginTime)
+        self.dialog.layerSelector.currentIndexChanged[str].connect(self._onSelectedCoverageChanged)
+        self.dialog.beginTimeSelector.currentIndexChanged[int].connect(self._onSelectedBeginTime)
         
         self.dialog.buttonAddLayer.clicked.connect(self._onAcceptClicked)
         

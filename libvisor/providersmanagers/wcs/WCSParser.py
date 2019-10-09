@@ -1,15 +1,17 @@
 # -*- coding=utf8 -*-
 
 import uuid
-import urllib2
+from urllib.request import urlopen
+import urllib.request
 import tempfile
 
+
 import xml.etree.ElementTree as ET
-from PyQt4.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 from qgis.core import QgsRasterLayer
 
-from THREDDSExplorer.libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
-from THREDDSExplorer.libvisor.utilities import Utilities
+from ..BoundingBoxInfo import BoundingBox
+from ...utilities import Utilities
 
 class WCScoverage(object):
     """Base model to store WCS coverage information.
@@ -182,7 +184,7 @@ class WCSparser(QObject):
         and stores them in this object.
         """
         self.availableCoverages = []
-        page = urllib2.urlopen(self.urlDescribeCoverage)
+        page = urllib.request.urlopen(self.urlDescribeCoverage)
         string = page.read()
         xml = ET.fromstring(string)
         treeCoverages = ET.ElementTree(xml)

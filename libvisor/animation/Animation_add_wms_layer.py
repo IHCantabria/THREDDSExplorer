@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -15,12 +15,12 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 class Ui_AddLayerDialog(object):
     def setupUi(self, AddLayerDialog):
@@ -28,34 +28,34 @@ class Ui_AddLayerDialog(object):
         AddLayerDialog.resize(296, 166)
         AddLayerDialog.setMinimumSize(QtCore.QSize(296, 166))
         AddLayerDialog.setMaximumSize(QtCore.QSize(500, 280))
-        self.verticalLayout = QtGui.QVBoxLayout(AddLayerDialog)
+        self.verticalLayout = QtWidgets.QVBoxLayout(AddLayerDialog)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.label = QtGui.QLabel(AddLayerDialog)
+        self.label = QtWidgets.QLabel(AddLayerDialog)
         self.label.setMinimumSize(QtCore.QSize(278, 13))
         self.label.setObjectName(_fromUtf8("label"))
         self.verticalLayout.addWidget(self.label)
-        self.layerSelector = QtGui.QComboBox(AddLayerDialog)
+        self.layerSelector = QtWidgets.QComboBox(AddLayerDialog)
         self.layerSelector.setObjectName(_fromUtf8("layerSelector"))
         self.layerSelector.addItem(_fromUtf8(""))
         self.verticalLayout.addWidget(self.layerSelector)
-        self.styleSelectorLayout = QtGui.QHBoxLayout()
+        self.styleSelectorLayout = QtWidgets.QHBoxLayout()
         self.styleSelectorLayout.setObjectName(_fromUtf8("styleSelectorLayout"))
-        self.graphicSelector = QtGui.QComboBox(AddLayerDialog)
+        self.graphicSelector = QtWidgets.QComboBox(AddLayerDialog)
         self.graphicSelector.setObjectName(_fromUtf8("graphicSelector"))
         self.styleSelectorLayout.addWidget(self.graphicSelector)
-        self.paletteSelector = QtGui.QComboBox(AddLayerDialog)
+        self.paletteSelector = QtWidgets.QComboBox(AddLayerDialog)
         self.paletteSelector.setObjectName(_fromUtf8("paletteSelector"))
         self.styleSelectorLayout.addWidget(self.paletteSelector)
         self.verticalLayout.addLayout(self.styleSelectorLayout)
-        self.beginTimeSelector = QtGui.QComboBox(AddLayerDialog)
+        self.beginTimeSelector = QtWidgets.QComboBox(AddLayerDialog)
         self.beginTimeSelector.setObjectName(_fromUtf8("beginTimeSelector"))
         self.beginTimeSelector.addItem(_fromUtf8(""))
         self.verticalLayout.addWidget(self.beginTimeSelector)
-        self.finishTimeSelector = QtGui.QComboBox(AddLayerDialog)
+        self.finishTimeSelector = QtWidgets.QComboBox(AddLayerDialog)
         self.finishTimeSelector.setObjectName(_fromUtf8("finishTimeSelector"))
         self.finishTimeSelector.addItem(_fromUtf8(""))
         self.verticalLayout.addWidget(self.finishTimeSelector)
-        self.buttonAddLayer = QtGui.QPushButton(AddLayerDialog)
+        self.buttonAddLayer = QtWidgets.QPushButton(AddLayerDialog)
         self.buttonAddLayer.setObjectName(_fromUtf8("buttonAddLayer"))
         self.verticalLayout.addWidget(self.buttonAddLayer)
 

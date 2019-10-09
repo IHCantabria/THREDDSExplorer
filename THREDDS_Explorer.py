@@ -20,14 +20,14 @@ THREDDSExplorer
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
-import resources
+#from .resources import *
 # Import the code for the dialog
-from Visor_UI import Visor
+from .Visor_UI import Visor
 import os.path
-
 
 class THREDDSExplorer:
     """QGIS Plugin Implementation."""
@@ -159,13 +159,19 @@ class THREDDSExplorer:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        
+        self.toolbar = self.iface.addToolBar("TEGToolbar")
 
-        icon_path = ':/plugins/THREDDSExplorer/icon.png'
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Access THREDDS server list'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
+        # Create actions 
+        self.pluginMain = QAction(QIcon(os.path.join(os.path.dirname(__file__), "icon.png")),
+                               QCoreApplication.translate("TE", "ThreddsExplorer"),
+                               self.iface.mainWindow())
+
+        # Connect action signals to slots
+        self.pluginMain.triggered.connect(self.run)
+
+        # Add actions to the toolbar
+        self.toolbar.addAction(self.pluginMain)
 
 
     def unload(self):

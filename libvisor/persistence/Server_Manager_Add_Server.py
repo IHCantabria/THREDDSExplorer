@@ -5,7 +5,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -14,12 +14,12 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 class Ui_AddServerDialog(object):
     def setupUi(self, AddServerDialog):
@@ -27,30 +27,30 @@ class Ui_AddServerDialog(object):
         AddServerDialog.setWindowModality(QtCore.Qt.ApplicationModal)
         AddServerDialog.resize(314, 122)
         AddServerDialog.setMaximumSize(QtCore.QSize(441, 157))
-        self.gridLayout = QtGui.QGridLayout(AddServerDialog)
+        self.gridLayout = QtWidgets.QGridLayout(AddServerDialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.formLayout = QtGui.QFormLayout()
-        self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
+        self.formLayout = QtWidgets.QFormLayout()
+        self.formLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
-        self.labelServerBaseURL = QtGui.QLabel(AddServerDialog)
+        self.labelServerBaseURL = QtWidgets.QLabel(AddServerDialog)
         self.labelServerBaseURL.setObjectName(_fromUtf8("labelServerBaseURL"))
-        self.formLayout.setWidget(1, QtGui.QFormLayout.LabelRole, self.labelServerBaseURL)
-        self.editServerURL = QtGui.QLineEdit(AddServerDialog)
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.labelServerBaseURL)
+        self.editServerURL = QtWidgets.QLineEdit(AddServerDialog)
         self.editServerURL.setObjectName(_fromUtf8("editServerURL"))
-        self.formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.editServerURL)
-        self.labelThreddsPath = QtGui.QLabel(AddServerDialog)
+        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.editServerURL)
+        self.labelThreddsPath = QtWidgets.QLabel(AddServerDialog)
         self.labelThreddsPath.setObjectName(_fromUtf8("labelThreddsPath"))
-        self.formLayout.setWidget(0, QtGui.QFormLayout.LabelRole, self.labelThreddsPath)
-        self.editServerName = QtGui.QLineEdit(AddServerDialog)
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.labelThreddsPath)
+        self.editServerName = QtWidgets.QLineEdit(AddServerDialog)
         self.editServerName.setObjectName(_fromUtf8("editServerName"))
-        self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.editServerName)
-        self.label = QtGui.QLabel(AddServerDialog)
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.editServerName)
+        self.label = QtWidgets.QLabel(AddServerDialog)
         self.label.setObjectName(_fromUtf8("label"))
-        self.formLayout.setWidget(2, QtGui.QFormLayout.SpanningRole, self.label)
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.SpanningRole, self.label)
         self.verticalLayout.addLayout(self.formLayout)
-        self.buttonAddServer = QtGui.QPushButton(AddServerDialog)
+        self.buttonAddServer = QtWidgets.QPushButton(AddServerDialog)
         self.buttonAddServer.setObjectName(_fromUtf8("buttonAddServer"))
         self.verticalLayout.addWidget(self.buttonAddServer)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
