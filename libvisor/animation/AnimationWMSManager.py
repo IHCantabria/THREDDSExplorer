@@ -4,7 +4,7 @@ Created on 27 de ene. de 2016
 @author: IHC
 '''
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Signal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from ..providersmanagers.wms.WMSParser import WMSparser
 from . import Animation_add_wms_layer
 from .AnimationLayer import AnimationLayer

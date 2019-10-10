@@ -4,7 +4,7 @@ Created on 27 de ene. de 2016
 @author: IHC
 '''
 from PyQt5.QtWidgets import QMessageBox, QWidget
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Signal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from ..providersmanagers.wcs.WCSParser import WCSparser
 from . import Animation_add_wcs_layer
 from .AnimationLayer import AnimationLayer

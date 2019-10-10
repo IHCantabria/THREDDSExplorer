@@ -272,13 +272,13 @@ class ThreddsCatalogInfo(QObject):
             aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
             while(len(aliveThreads) > self.maxDownloadThreadsPerSet): #We limit the amount of concurrent threads.
                 aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
-                time.sleep(0.1)
+                time.sleep(0.5)
             item.start()
 
         #Workaround. For some reasons, joining the threads cause QGIS to
         #break and die.
         while len(aliveThreads) > 0:
-            time.sleep(0.1)
+            time.sleep(0.5)
             aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
 
         asyncProcesses = None

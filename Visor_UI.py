@@ -25,7 +25,7 @@ from threading import RLock
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import pyqtSlot, Signal, Qt
+from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QMessageBox, QStatusBar
 
 from qgis.utils import iface
