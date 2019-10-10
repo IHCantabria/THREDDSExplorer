@@ -10,7 +10,7 @@
 name=THREDDS Explorer
 qgisMinimumVersion=3.4
 description=Static and animated data viewer for THREDDS based servers
-version=1.1
+version=2.0.1
 author=IH Cantabria
 email=beneditom@unican.es
 
