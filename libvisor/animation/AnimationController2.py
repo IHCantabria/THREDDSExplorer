@@ -160,7 +160,7 @@ class Controller(QObject):
                     self.pause()
                     self.errorSignal.emit("A layer for this animation was not found.\nWas it removed?"\
                                           " Please, click\nagain on prepare animation to fix this issue.")
-                    QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                    QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", Qgis.Critical )
                 self.framesShown.append(layer)
             except KeyError:
                 #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )

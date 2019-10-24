@@ -620,9 +620,9 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         self.postInformationMessageToUser("Layer '"+image[1]+"' ["+image[2]+"]retrieved")
         layer = image[0]
         if layer and layer.isValid():
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            QgsProject.instance().addMapLayer(layer)
             iface.zoomToActiveLayer()
-            iface.legendInterface().refreshLayerSymbology(layer)
+            iface.layerTreeView().refreshLayerSymbology(layer.id())
         else:
             self.postInformationMessageToUser("There was a problem loading the layer.")
 
