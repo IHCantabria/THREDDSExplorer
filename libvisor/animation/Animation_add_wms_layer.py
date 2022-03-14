@@ -11,16 +11,22 @@ from PyQt5 import QtCore, QtWidgets
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
+
     def _fromUtf8(s):
         return s
 
+
 try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class Ui_AddLayerDialog(object):
     def setupUi(self, AddLayerDialog):
@@ -63,10 +69,19 @@ class Ui_AddLayerDialog(object):
         QtCore.QMetaObject.connectSlotsByName(AddLayerDialog)
 
     def retranslateUi(self, AddLayerDialog):
-        AddLayerDialog.setWindowTitle(_translate("AddLayerDialog", "Add new layer to animation", None))
+        AddLayerDialog.setWindowTitle(
+            _translate("AddLayerDialog", "Add new layer to animation", None)
+        )
         self.label.setText(_translate("AddLayerDialog", "Selected map: ", None))
-        self.layerSelector.setItemText(0, _translate("AddLayerDialog", "Select a layer...", None))
-        self.beginTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation begins at...", None))
-        self.finishTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation finishes at...", None))
-        self.buttonAddLayer.setText(_translate("AddLayerDialog", "Add to layer list", None))
-
+        self.layerSelector.setItemText(
+            0, _translate("AddLayerDialog", "Select a layer...", None)
+        )
+        self.beginTimeSelector.setItemText(
+            0, _translate("AddLayerDialog", "Animation begins at...", None)
+        )
+        self.finishTimeSelector.setItemText(
+            0, _translate("AddLayerDialog", "Animation finishes at...", None)
+        )
+        self.buttonAddLayer.setText(
+            _translate("AddLayerDialog", "Add to layer list", None)
+        )

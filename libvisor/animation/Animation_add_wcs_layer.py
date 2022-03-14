@@ -11,16 +11,22 @@ from PyQt5 import QtCore, QtWidgets
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
+
     def _fromUtf8(s):
         return s
 
+
 try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class Ui_AddLayerDialog(object):
     def setupUi(self, AddLayerDialog):
@@ -60,7 +66,9 @@ class Ui_AddLayerDialog(object):
         self.eastBound.setObjectName(_fromUtf8("eastBound"))
         self.gridLayout.addWidget(self.eastBound, 2, 2, 1, 1)
         self.northBound = QtWidgets.QLineEdit(AddLayerDialog)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.northBound.sizePolicy().hasHeightForWidth())
@@ -80,11 +88,20 @@ class Ui_AddLayerDialog(object):
         QtCore.QMetaObject.connectSlotsByName(AddLayerDialog)
 
     def retranslateUi(self, AddLayerDialog):
-        AddLayerDialog.setWindowTitle(_translate("AddLayerDialog", "Add new layer to animation", None))
+        AddLayerDialog.setWindowTitle(
+            _translate("AddLayerDialog", "Add new layer to animation", None)
+        )
         self.label.setText(_translate("AddLayerDialog", "Selected map: ", None))
-        self.layerSelector.setItemText(0, _translate("AddLayerDialog", "Select a layer...", None))
-        self.beginTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation begins at...", None))
-        self.finishTimeSelector.setItemText(0, _translate("AddLayerDialog", "Animation finishes at...", None))
+        self.layerSelector.setItemText(
+            0, _translate("AddLayerDialog", "Select a layer...", None)
+        )
+        self.beginTimeSelector.setItemText(
+            0, _translate("AddLayerDialog", "Animation begins at...", None)
+        )
+        self.finishTimeSelector.setItemText(
+            0, _translate("AddLayerDialog", "Animation finishes at...", None)
+        )
         self.labelCRS.setText(_translate("AddLayerDialog", "CRS INFO", None))
-        self.buttonAddLayer.setText(_translate("AddLayerDialog", "Add to layer list", None))
-
+        self.buttonAddLayer.setText(
+            _translate("AddLayerDialog", "Add to layer list", None)
+        )

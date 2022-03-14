@@ -11,16 +11,22 @@ from PyQt5 import QtCore, QtWidgets
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
+
     def _fromUtf8(s):
         return s
 
+
 try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class Ui_THREDDSViewer(object):
     def setupUi(self, THREDDSViewer):
@@ -37,7 +43,9 @@ class Ui_THREDDSViewer(object):
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents_7 = QtWidgets.QWidget()
         self.scrollAreaWidgetContents_7.setGeometry(QtCore.QRect(0, 0, 376, 731))
-        self.scrollAreaWidgetContents_7.setObjectName(_fromUtf8("scrollAreaWidgetContents_7"))
+        self.scrollAreaWidgetContents_7.setObjectName(
+            _fromUtf8("scrollAreaWidgetContents_7")
+        )
         self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents_7)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.gridLayout = QtWidgets.QGridLayout()
@@ -157,7 +165,9 @@ class Ui_THREDDSViewer(object):
         self.button_req_map.setMaximumSize(QtCore.QSize(256, 23))
         self.button_req_map.setObjectName(_fromUtf8("button_req_map"))
         self.gridLayout_3.addWidget(self.button_req_map, 8, 0, 1, 1)
-        self.button_req_animation = QtWidgets.QPushButton(self.scrollAreaWidgetContents_7)
+        self.button_req_animation = QtWidgets.QPushButton(
+            self.scrollAreaWidgetContents_7
+        )
         self.button_req_animation.setObjectName(_fromUtf8("button_req_animation"))
         self.gridLayout_3.addWidget(self.button_req_animation, 9, 0, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_3)
@@ -168,7 +178,9 @@ class Ui_THREDDSViewer(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setContentsMargins(-1, -1, -1, 5)
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.buttonManageServers = QtWidgets.QPushButton(self.scrollAreaWidgetContents_7)
+        self.buttonManageServers = QtWidgets.QPushButton(
+            self.scrollAreaWidgetContents_7
+        )
         self.buttonManageServers.setObjectName(_fromUtf8("buttonManageServers"))
         self.horizontalLayout.addWidget(self.buttonManageServers)
         self.gridLayout.addLayout(self.horizontalLayout, 0, 0, 1, 1)
@@ -182,24 +194,73 @@ class Ui_THREDDSViewer(object):
         QtCore.QMetaObject.connectSlotsByName(THREDDSViewer)
 
     def retranslateUi(self, THREDDSViewer):
-        THREDDSViewer.setWindowTitle(_translate("THREDDSViewer", "THREDDS Explorer", None))
-        self.label.setText(_translate("THREDDSViewer", "Choose an available DataSet", None))
-        self.tree_widget.headerItem().setText(0, _translate("THREDDSViewer", "SubDatasets and Maps", None))
-        self.combo_wms_style_type.setToolTip(_translate("THREDDSViewer", "Style draw type", None))
-        self.combo_wms_style_palette.setToolTip(_translate("THREDDSViewer", "Style color palette to use", None))
-        self.WMSLabelTimeRange.setText(_translate("THREDDSViewer", "Time range to download:", None))
-        self.combo_wms_time.setToolTip(_translate("THREDDSViewer", "First time value to download for this layer", None))
-        self.combo_wms_time_last.setToolTip(_translate("THREDDSViewer", "Last time value to download for this layer\n"
-"(If set, will download all the layers between the first and last times)", None))
-        self.WMSBoundingBoxInfo.setText(_translate("THREDDSViewer", "No bounding box info available", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_WMS), _translate("THREDDSViewer", "WMS", None))
-        self.WCSLabelTimeRange.setText(_translate("THREDDSViewer", "Time range to download:", None))
-        self.combo_wcs_time.setToolTip(_translate("THREDDSViewer", "First time value to download for this layer", None))
-        self.combo_wcs_time_last.setToolTip(_translate("THREDDSViewer", "Last time value to download for this layer\n"
-"(If set, will download all the layers between the first and last times)", None))
-        self.WCSBoundingBoxInfo.setText(_translate("THREDDSViewer", "No bounding box info available", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_WCS), _translate("THREDDSViewer", "WCS", None))
-        self.button_req_map.setText(_translate("THREDDSViewer", "Show map in view", None))
-        self.button_req_animation.setText(_translate("THREDDSViewer", "Show animation menu >>", None))
-        self.buttonManageServers.setText(_translate("THREDDSViewer", "Manage servers...", None))
-
+        THREDDSViewer.setWindowTitle(
+            _translate("THREDDSViewer", "THREDDS Explorer", None)
+        )
+        self.label.setText(
+            _translate("THREDDSViewer", "Choose an available DataSet", None)
+        )
+        self.tree_widget.headerItem().setText(
+            0, _translate("THREDDSViewer", "SubDatasets and Maps", None)
+        )
+        self.combo_wms_style_type.setToolTip(
+            _translate("THREDDSViewer", "Style draw type", None)
+        )
+        self.combo_wms_style_palette.setToolTip(
+            _translate("THREDDSViewer", "Style color palette to use", None)
+        )
+        self.WMSLabelTimeRange.setText(
+            _translate("THREDDSViewer", "Time range to download:", None)
+        )
+        self.combo_wms_time.setToolTip(
+            _translate(
+                "THREDDSViewer", "First time value to download for this layer", None
+            )
+        )
+        self.combo_wms_time_last.setToolTip(
+            _translate(
+                "THREDDSViewer",
+                "Last time value to download for this layer\n"
+                "(If set, will download all the layers between the first and last times)",
+                None,
+            )
+        )
+        self.WMSBoundingBoxInfo.setText(
+            _translate("THREDDSViewer", "No bounding box info available", None)
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_WMS),
+            _translate("THREDDSViewer", "WMS", None),
+        )
+        self.WCSLabelTimeRange.setText(
+            _translate("THREDDSViewer", "Time range to download:", None)
+        )
+        self.combo_wcs_time.setToolTip(
+            _translate(
+                "THREDDSViewer", "First time value to download for this layer", None
+            )
+        )
+        self.combo_wcs_time_last.setToolTip(
+            _translate(
+                "THREDDSViewer",
+                "Last time value to download for this layer\n"
+                "(If set, will download all the layers between the first and last times)",
+                None,
+            )
+        )
+        self.WCSBoundingBoxInfo.setText(
+            _translate("THREDDSViewer", "No bounding box info available", None)
+        )
+        self.tabWidget.setTabText(
+            self.tabWidget.indexOf(self.tab_WCS),
+            _translate("THREDDSViewer", "WCS", None),
+        )
+        self.button_req_map.setText(
+            _translate("THREDDSViewer", "Show map in view", None)
+        )
+        self.button_req_animation.setText(
+            _translate("THREDDSViewer", "Show animation menu >>", None)
+        )
+        self.buttonManageServers.setText(
+            _translate("THREDDSViewer", "Manage servers...", None)
+        )

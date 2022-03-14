@@ -12,6 +12,7 @@ from qgis.core import *
 from qgis.utils import iface
 import traceback
 
+
 class Map(object):
     """
     Model for any maps found in the thredds server.
@@ -22,6 +23,7 @@ class Map(object):
     coverage information path (this last path is not,
     as of now, strictly required).
     """
+
     def __init__(self, name, WMS, WCS):
         """
         :param    nombre:    Name of this map object.
@@ -39,8 +41,10 @@ class Map(object):
 
     def getName(self):
         return self.name
+
     def getWMS(self):
         return self.WMS
+
     def getWCS(self):
         return self.WCS
 
@@ -48,8 +52,9 @@ class Map(object):
         """
         Container for WCS access information for a single map.
         """
-        namespace = '{http://www.opengis.net/wcs}'
-        xlink = '{http://www.w3.org/1999/xlink}'
+
+        namespace = "{http://www.opengis.net/wcs}"
+        xlink = "{http://www.w3.org/1999/xlink}"
 
         def __init__(self, URLcapabilities):
             self.URLcapabilities = URLcapabilities
@@ -66,11 +71,14 @@ class Map(object):
             self._generateCoverageURL()
 
         def _generateCoverageURL(self):
-            urlBase = self.URLcapabilities.partition('?')[0]
-            self.URLcoverage = (urlBase + '?'
-                                    + 'service=WCS'
-                                    + '&version=1.0.0'
-                                    + '&request=DescribeCoverage')
+            urlBase = self.URLcapabilities.partition("?")[0]
+            self.URLcoverage = (
+                urlBase
+                + "?"
+                + "service=WCS"
+                + "&version=1.0.0"
+                + "&request=DescribeCoverage"
+            )
 
 
 class DataSet(object):
@@ -91,7 +99,8 @@ class DataSet(object):
     :param parent  Dataset to which this set belongs.
     :type parent   DataSet
     """
-    def __init__(self, name, url, parent = None):
+
+    def __init__(self, name, url, parent=None):
         self.name = name
         self.url = url
         self.subDataset = []
@@ -99,29 +108,29 @@ class DataSet(object):
         self.parent = parent
 
     def __str__(self):
-        string = 'DataSet '+self.name +'\nURL: '+self.url
+        string = "DataSet " + self.name + "\nURL: " + self.url
         if len(self.mapList) > 0:
-            string += '\n + Available maps:\n'
+            string += "\n + Available maps:\n"
             for mapa in self.mapList:
-                string += '    - ' + mapa.getName() + '\n'
+                string += "    - " + mapa.getName() + "\n"
 
         if len(self.subDataset) > 0:
-            string += '\n + Available sub-datasets: \n'
+            string += "\n + Available sub-datasets: \n"
             for element in self.subDataset:
                 subString = str(element)
-                newString = ''
-                for line in subString.split('\n'):
-                    newString += '     ' + line +'\n'
+                newString = ""
+                for line in subString.split("\n"):
+                    newString += "     " + line + "\n"
                 string += newString
 
         return string
-
 
     def getName(self):
         return self.name
 
     def getParent(self):
         return self.parent
+
     def getMainCatalogURL(self):
         return self.url
 
@@ -140,7 +149,7 @@ class DataSet(object):
     def addMap(self, mapa):
         self.mapList.append(mapa)
 
-    def searchMapsByName(self, stringToFind, exactMatch = False, recursive = True):
+    def searchMapsByName(self, stringToFind, exactMatch=False, recursive=True):
         """
         Returns a list of maps found within this set,
         which contain the specified text in their name or whose
@@ -150,18 +159,20 @@ class DataSet(object):
         resultado = {}
         for mapa in self.mapList:
             match = False
-            if (exactMatch == False):
-                match = (stringToFind.lower() in mapa.getName().lower())
-            elif(exactMatch == True ):
-                match = (stringToFind.lower() == mapa.getName().lower())
-            if(match):
+            if exactMatch == False:
+                match = stringToFind.lower() in mapa.getName().lower()
+            elif exactMatch == True:
+                match = stringToFind.lower() == mapa.getName().lower()
+            if match:
                 resultado[mapa.getName()] = mapa
         if recursive is True:
             for subSet in self.subDataset:
-                resultado.update(subSet.searchMapsByName(stringToFind, exactMatch, recursive))
+                resultado.update(
+                    subSet.searchMapsByName(stringToFind, exactMatch, recursive)
+                )
         return resultado
 
-    def searchSubsetsByName(self, criterioBusqueda, exactMatch = False, recursive = True):
+    def searchSubsetsByName(self, criterioBusqueda, exactMatch=False, recursive=True):
         """
         Returns a list of sub data sets found within this set,
         which contain the specified text in their name or whose
@@ -173,17 +184,20 @@ class DataSet(object):
         match = False
         for subSet in self.subDataset:
             match = False
-            if (exactMatch == False):
-                match = (criterioBusqueda.lower() in subSet.getName().lower())
-            elif(exactMatch == True ):
-                match = (criterioBusqueda == subSet.getName())
-            if(match):
+            if exactMatch == False:
+                match = criterioBusqueda.lower() in subSet.getName().lower()
+            elif exactMatch == True:
+                match = criterioBusqueda == subSet.getName()
+            if match:
                 resultado.append(subSet)
 
             if recursive is True:
-                resultado.extend(subSet.searchSubsetsByName(criterioBusqueda, exactMatch, recursive))
+                resultado.extend(
+                    subSet.searchSubsetsByName(criterioBusqueda, exactMatch, recursive)
+                )
 
         return resultado
+
 
 class ThreddsCatalogInfo(QObject):
     """
@@ -197,10 +211,13 @@ class ThreddsCatalogInfo(QObject):
     """
 
     threddsServerMapObjectRetrieved = pyqtSignal(list, str)
-    singleDataSetMapComplete = pyqtSignal(DataSet) #Emitted every time a new DataSet is mapped completely.
+    singleDataSetMapComplete = pyqtSignal(
+        DataSet
+    )  # Emitted every time a new DataSet is mapped completely.
 
-
-    def __init__(self, threddsMainCatalog, serverUserReadableName="No server name specified"):
+    def __init__(
+        self, threddsMainCatalog, serverUserReadableName="No server name specified"
+    ):
         """
 
         :param    threddsMainCatalog:    Full path to this thredds server main catalog.xml
@@ -212,10 +229,12 @@ class ThreddsCatalogInfo(QObject):
 
         """
         super(ThreddsCatalogInfo, self).__init__()
-        self.namespace = '{http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0}'
-        self.xlink = '{http://www.w3.org/1999/xlink}'
-        self.threddsMainCatalog = threddsMainCatalog.rstrip(r'/')
-        self.threddsCatalogFileName = 'catalog.xml'
+        self.namespace = (
+            "{http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0}"
+        )
+        self.xlink = "{http://www.w3.org/1999/xlink}"
+        self.threddsMainCatalog = threddsMainCatalog.rstrip(r"/")
+        self.threddsCatalogFileName = "catalog.xml"
         self.AvailableDataSetList = []
         self.NetworkRequestTimeout = 20
         self.maxDownloadThreadsPerSet = 80
@@ -224,12 +243,10 @@ class ThreddsCatalogInfo(QObject):
     def setThreddsMainCatalog(self, threddsMainCatalog):
         self.threddsMainCatalog = threddsMainCatalog
 
-
     def getServerName(self):
         return self.serverName
 
-
-    def fetchAvailableDatasets(self, depth = -1):
+    def fetchAvailableDatasets(self, depth=-1):
         """
         Will parse all the dataSet info from the URL
         this object points to, and return once it's completely
@@ -246,48 +263,55 @@ class ThreddsCatalogInfo(QObject):
         :type     depth:    int
         """
         try:
-            page = urllib.request.urlopen(self.threddsMainCatalog+r'/'+self.threddsCatalogFileName,
-                                timeout=self.NetworkRequestTimeout)
+            page = urllib.request.urlopen(
+                self.threddsMainCatalog + r"/" + self.threddsCatalogFileName,
+                timeout=self.NetworkRequestTimeout,
+            )
         except (HTTPException, URLError, ValueError) as e:
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
             raise e
 
         string = page.read()
         xml = ET.fromstring(string)
         tree = ET.ElementTree(xml)
         root = tree.getroot()
-        dataSets = root.findall('.//{0}catalogRef'.format(self.namespace))
+        dataSets = root.findall(".//{0}catalogRef".format(self.namespace))
         self.AvailableDataSetList = []
         asyncProcesses = []
 
         for item in dataSets:
-            nombre = item.attrib['{0}title'.format(self.xlink)]
-            url = item.attrib[self.xlink+'href']
-            asyncProcess = threading.Thread(target = self._startBaseSetCreation,
-                                           args=(nombre,url, depth), name=nombre)
+            nombre = item.attrib["{0}title".format(self.xlink)]
+            url = item.attrib[self.xlink + "href"]
+            asyncProcess = threading.Thread(
+                target=self._startBaseSetCreation,
+                args=(nombre, url, depth),
+                name=nombre,
+            )
             asyncProcesses.append(asyncProcess)
 
-
         for item in asyncProcesses:
-            aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
-            while(len(aliveThreads) > self.maxDownloadThreadsPerSet): #We limit the amount of concurrent threads.
-                aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
+            aliveThreads = {x for x in asyncProcesses if x.is_alive() == True}
+            while (
+                len(aliveThreads) > self.maxDownloadThreadsPerSet
+            ):  # We limit the amount of concurrent threads.
+                aliveThreads = {x for x in asyncProcesses if x.is_alive() == True}
                 time.sleep(0.5)
             item.start()
 
-        #Workaround. For some reasons, joining the threads cause QGIS to
-        #break and die.
+        # Workaround. For some reasons, joining the threads cause QGIS to
+        # break and die.
         while len(aliveThreads) > 0:
             time.sleep(0.5)
-            aliveThreads = {x for x in asyncProcesses if x.is_alive() == True }
+            aliveThreads = {x for x in asyncProcesses if x.is_alive() == True}
 
         asyncProcesses = None
-        self.threddsServerMapObjectRetrieved.emit(self.AvailableDataSetList, self.serverName)
+        self.threddsServerMapObjectRetrieved.emit(
+            self.AvailableDataSetList, self.serverName
+        )
 
-
-
-
-    def _startBaseSetCreation(self, name, url, depth = -1):
+    def _startBaseSetCreation(self, name, url, depth=-1):
         """
         Should be called asynchronously.
 
@@ -314,7 +338,7 @@ class ThreddsCatalogInfo(QObject):
             self.fillDataSet(dataset, depth)
             self.AvailableDataSetList.append(dataset)
         except Exception:
-            pass #We can not do much at this point.
+            pass  # We can not do much at this point.
 
     def _asyncFillDataSet(self, dataSet, depth=-1):
         """
@@ -328,45 +352,45 @@ class ThreddsCatalogInfo(QObject):
         try:
             page = urllib.request.urlopen(url, timeout=self.NetworkRequestTimeout)
         except Exception as e:
-            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-            iface.messageBar().pushMessage("THREDDS Explorer", str(e), level=Qgis.Critical)
-            #raise e
+            # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage(
+                "THREDDS Explorer", str(e), level=Qgis.Critical
+            )
+            # raise e
 
         string = page.read()
         xml = ET.fromstring(string)
         tree = ET.ElementTree(xml)
         root = tree.getroot()
 
-
-        #Si no hay catalogRefs, nos encontramos en un directorio
-        #con 'mapas'. Si hay catalogRefs, es un subcatálogo..
-        subDataSets = root.findall('.//{0}catalogRef'.format(self.namespace))
-        if(len(subDataSets) > 0):
+        # Si no hay catalogRefs, nos encontramos en un directorio
+        # con 'mapas'. Si hay catalogRefs, es un subcatálogo..
+        subDataSets = root.findall(".//{0}catalogRef".format(self.namespace))
+        if len(subDataSets) > 0:
             for item in subDataSets:
                 try:
-                    nombre = item.attrib['ID']
+                    nombre = item.attrib["ID"]
                 except KeyError:
-                    nombre = item.attrib[self.xlink+'title']
+                    nombre = item.attrib[self.xlink + "title"]
 
-                #We will look for any attribute which MAY be an URL..
-                #... this means, which contains a slash.
+                # We will look for any attribute which MAY be an URL..
+                # ... this means, which contains a slash.
                 attribute = None
                 for att in item.attrib:
-                    if '/' in att:
+                    if "/" in att:
                         attribute = att
                         break
-                subUrl = self.translateCatalogURL(item.attrib[attribute], parentCatalogURL=url) #url is parent URL
+                subUrl = self.translateCatalogURL(
+                    item.attrib[attribute], parentCatalogURL=url
+                )  # url is parent URL
 
-
-
-
-
-                #IF this subset is already assigned to this dataSet
-                #as a subcatalog, we will not add it again. If we do not
-                #perform this check, and we try to re-map an already mapped
-                #dataset, we will end up duplicating entries for subsets.
-                subcatalogSearchResult = (dataSet.searchSubsetsByName(
-                                               nombre, exactMatch = True, recursive = False))
+                # IF this subset is already assigned to this dataSet
+                # as a subcatalog, we will not add it again. If we do not
+                # perform this check, and we try to re-map an already mapped
+                # dataset, we will end up duplicating entries for subsets.
+                subcatalogSearchResult = dataSet.searchSubsetsByName(
+                    nombre, exactMatch=True, recursive=False
+                )
                 alreadySubcatalogOfDataset = len(subcatalogSearchResult) > 0
                 if alreadySubcatalogOfDataset is False:
                     subSet = DataSet(nombre, subUrl, parent=dataSet)
@@ -374,81 +398,96 @@ class ThreddsCatalogInfo(QObject):
                 else:
                     subSet = subcatalogSearchResult[0]
 
-                #Rationale for when I forget: We are substracting one per step,
-                #thus if negative (default for whole server map) we won't find a zero...
+                # Rationale for when I forget: We are substracting one per step,
+                # thus if negative (default for whole server map) we won't find a zero...
                 if depth is not 0:
-                    self.fillDataSet(subSet, depth-1)
+                    self.fillDataSet(subSet, depth - 1)
 
-
-
-        mapas = root.findall('.//{0}dataset//{0}dataset'.format(self.namespace))
-        if(len(mapas)>0):
-            #First, we get the url for the WMS/WCS servers of this
-            #dataset...
+        mapas = root.findall(".//{0}dataset//{0}dataset".format(self.namespace))
+        if len(mapas) > 0:
+            # First, we get the url for the WMS/WCS servers of this
+            # dataset...
             try:
-                wcsService = (root
-                              .findall('.//{0}service//{0}service[@serviceType=\"WCS\"]'
-                                       .format(self.namespace))[0]).attrib['base']
+                wcsService = (
+                    root.findall(
+                        './/{0}service//{0}service[@serviceType="WCS"]'.format(
+                            self.namespace
+                        )
+                    )[0]
+                ).attrib["base"]
             except Exception:
                 wcsService = None
 
             try:
-                wmsService = (root
-                              .findall('.//{0}service//{0}service[@serviceType=\"WMS\"]'
-                                       .format(self.namespace))[0]).attrib['base']
+                wmsService = (
+                    root.findall(
+                        './/{0}service//{0}service[@serviceType="WMS"]'.format(
+                            self.namespace
+                        )
+                    )[0]
+                ).attrib["base"]
             except Exception:
                 wmsService = None
 
-            #If the server does not provide access to any of the services
-            #we support, we return right here.
+            # If the server does not provide access to any of the services
+            # we support, we return right here.
             if wcsService is None and wmsService is None:
                 return
 
             for item in mapas:
-                nombre = item.attrib['name']
+                nombre = item.attrib["name"]
 
-
-                #IF this map is already assigned to this dataSet
-                #we will not add it again. If we do not perform this check,
-                #and we try to re-map an already mapped
-                #dataset, we will end up duplicating entries for each map.
-                alreadyBelongsToDataset = (len(dataSet.searchMapsByName(
-                                               nombre, exactMatch = True, recursive = False)) > 0)
+                # IF this map is already assigned to this dataSet
+                # we will not add it again. If we do not perform this check,
+                # and we try to re-map an already mapped
+                # dataset, we will end up duplicating entries for each map.
+                alreadyBelongsToDataset = (
+                    len(
+                        dataSet.searchMapsByName(
+                            nombre, exactMatch=True, recursive=False
+                        )
+                    )
+                    > 0
+                )
                 if alreadyBelongsToDataset is True:
                     continue
 
-
-
                 try:
-                    itemFinalPath = item.attrib['urlPath']
+                    itemFinalPath = item.attrib["urlPath"]
                 except Exception:
-                    itemFinalPath = nombre #We try.. just in case.. you know.. it works.
+                    itemFinalPath = (
+                        nombre  # We try.. just in case.. you know.. it works.
+                    )
 
-                if '.xml' in nombre or '.xml' in itemFinalPath:
+                if ".xml" in nombre or ".xml" in itemFinalPath:
                     continue
 
-                #If WMS is supported by the server, we attempt to map it's access url
+                # If WMS is supported by the server, we attempt to map it's access url
                 rutaWMS = None
                 if wmsService is not None:
-                    #We first combine the base URL of this dataSet with the one which points
-                    #to the service..
-                    rutaWMS = (combineURLS(url.replace('catalog.xml',''), wmsService))
-                    #And then combine the previous URL which points to the service with the
-                    #one pointing to the resource, appending the request string.
-                    rutaWMS = (combineURLS(rutaWMS, itemFinalPath)
-                                + '?service=WMS&version=1.3.0&request=GetCapabilities')
+                    # We first combine the base URL of this dataSet with the one which points
+                    # to the service..
+                    rutaWMS = combineURLS(url.replace("catalog.xml", ""), wmsService)
+                    # And then combine the previous URL which points to the service with the
+                    # one pointing to the resource, appending the request string.
+                    rutaWMS = (
+                        combineURLS(rutaWMS, itemFinalPath)
+                        + "?service=WMS&version=1.3.0&request=GetCapabilities"
+                    )
 
-                #If WCS is supported by the server, we attempt to map it's access url
+                # If WCS is supported by the server, we attempt to map it's access url
                 rutaWCS = None
                 objWCS = None
                 if wcsService is not None:
-                    #We first combine the base URL of this dataSet with the one which points
-                    #to the service..
-                    rutaWCS = (combineURLS(url.replace('catalog.xml',''), wcsService))
-                    #And then combine the previous URL which points to the service with the
-                    #one pointing to the resource, appending the request string.
-                    rutaWCS = (combineURLS(rutaWCS, itemFinalPath)
-                                + '?service=WCS&version=1.0.0&request=GetCapabilities')
+                    # We first combine the base URL of this dataSet with the one which points
+                    # to the service..
+                    rutaWCS = combineURLS(url.replace("catalog.xml", ""), wcsService)
+                    # And then combine the previous URL which points to the service with the
+                    # one pointing to the resource, appending the request string.
+                    rutaWCS = (
+                        combineURLS(rutaWCS, itemFinalPath)
+                        + "?service=WCS&version=1.0.0&request=GetCapabilities"
+                    )
 
                     objWCS = Map.WCSinfo(rutaWCS)
 
@@ -481,8 +520,6 @@ class ThreddsCatalogInfo(QObject):
         """
         self._asyncFillDataSet(dataSet, depth)
 
-
-
     def getAvailableDatasets(self, depth=0):
         """
         Returns the current information about the thredds
@@ -500,12 +537,10 @@ class ThreddsCatalogInfo(QObject):
                               stored in this object.
         :type     depth:      int
         """
-        if (self.AvailableDataSetList is None
-            or len(self.AvailableDataSetList) < 1):
-                self.fetchAvailableDatasets(depth)
+        if self.AvailableDataSetList is None or len(self.AvailableDataSetList) < 1:
+            self.fetchAvailableDatasets(depth)
 
         return self.AvailableDataSetList
-
 
     def translateCatalogURL(self, dataSetCatalogURL, parentCatalogURL=None):
         """
@@ -530,7 +565,7 @@ class ThreddsCatalogInfo(QObject):
             url = dataSetCatalogURL
         else:
             if parentCatalogURL == None:
-                url= combineURLS(self.threddsMainCatalog, dataSetCatalogURL)
+                url = combineURLS(self.threddsMainCatalog, dataSetCatalogURL)
             else:
-                url = combineURLS(parentCatalogURL,dataSetCatalogURL)
+                url = combineURLS(parentCatalogURL, dataSetCatalogURL)
         return url

@@ -1,8 +1,8 @@
-'''
+"""
 Created on 28 de ene. de 2016
 
 @author: IHC
-'''
+"""
 
 # Standard libs:
 import time
@@ -22,6 +22,7 @@ from .AnimationLayer import AnimationLayer
 from ..utilities.LayerLegendGroupifier import LayerGroupifier
 from ..providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
 from ..providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
+
 
 class Controller(QObject):
     """Manages all operations required to handle animation operations.
@@ -56,13 +57,18 @@ class Controller(QObject):
     Several signals provide for status updates while preparing or
     playing back the animation.
     """
+
     animationPlaybackEnd = pyqtSignal()
     animatorReady = pyqtSignal()
-    externalAnimationLoaded = pyqtSignal(object)#Must be an AnimationLayer like object
+    externalAnimationLoaded = pyqtSignal(
+        object
+    )  # Must be an AnimationLayer like object
     animationGenerationStepDone = pyqtSignal()
-    newFrameShown = pyqtSignal(tuple) #Emitted when a new 'time frame' is shown, with the time tag as parameter
-    #Self-signal so the group creation will be run on main thread
-    #even after being requested by async ops.
+    newFrameShown = pyqtSignal(
+        tuple
+    )  # Emitted when a new 'time frame' is shown, with the time tag as parameter
+    # Self-signal so the group creation will be run on main thread
+    # even after being requested by async ops.
     createLayerGroupsOnMainThread = pyqtSignal(AnimationLayer, str)
     maxDownloadThreads = 3
     lock = threading.RLock()
@@ -73,8 +79,8 @@ class Controller(QObject):
     def __init__(self, parent=None):
         """Constructor."""
 
-        #TODO: Remove debug
-        #import sys
+        # TODO: Remove debug
+        # import sys
 
         super(Controller, self).__init__(parent)
         self.paused = True
@@ -92,12 +98,14 @@ class Controller(QObject):
         self.animationBeginTime = None
         self.animationEndTime = None
 
-        self.threadsInUse = {} #Dictionary which contains all the 'worker objects' and their assocciated threads.
-                                #in {workerObject : threadObject} form so we can cancel and so stuff with both.
+        self.threadsInUse = (
+            {}
+        )  # Dictionary which contains all the 'worker objects' and their assocciated threads.
+        # in {workerObject : threadObject} form so we can cancel and so stuff with both.
         self.framesShown = []
         self.animationElements = []
-        self.animationGroups = [] #QGIS UI layer groups
-        self.nextFrame = None #next time to be requested
+        self.animationGroups = []  # QGIS UI layer groups
+        self.nextFrame = None  # next time to be requested
         self.paused = True
         self.maxProgress = 0
         self.layersToBeGrouped = 0
@@ -126,7 +134,12 @@ class Controller(QObject):
     def getNumberOfFrames(self):
         try:
             timeRangeInDelta = abs(self.animationEndTime - self.animationBeginTime)
-            return int( (timeRangeInDelta.total_seconds()/self.timeDeltaPerFrame.total_seconds()))
+            return int(
+                (
+                    timeRangeInDelta.total_seconds()
+                    / self.timeDeltaPerFrame.total_seconds()
+                )
+            )
         except (AttributeError, ZeroDivisionError, TypeError):
             # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
             return 0
@@ -135,10 +148,10 @@ class Controller(QObject):
         if self.nextFrame is None or self.nextFrame < self.animationBeginTime:
             self.nextFrame = self.animationBeginTime
         elif self.nextFrame > self.animationEndTime:
-            #print("====END====")
-            #print(self.nextFrame)
-            #print(self.animationEndTime)
-            #print("====END====")
+            # print("====END====")
+            # print(self.nextFrame)
+            # print(self.animationEndTime)
+            # print("====END====")
             self.pause()
             self.nextFrame = self.animationBeginTime
             self.animationPlaybackEnd.emit()
@@ -147,54 +160,69 @@ class Controller(QObject):
         self.framesShown = []
         for animation in self.animationElements:
             try:
-                layer = animation.getFrameByTime(self.nextFrame,
-                                                  self.timeDeviationTolerance)
+                layer = animation.getFrameByTime(
+                    self.nextFrame, self.timeDeviationTolerance
+                )
                 try:
-                    #iface.legendInterface().setLayerVisible(layer, True)
-                    QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
-                    #QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
+                    # iface.legendInterface().setLayerVisible(layer, True)
+                    QgsProject.instance().layerTreeRoot().findLayer(
+                        layer.id()
+                    ).setItemVisibilityChecked(True)
+                    # QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(True)
                 except RuntimeError:
-                    #Will happen if the animator attempts to set as visible
-                    #a no longer existing layer (i.e. if the user removes
-                    #that layer or group from the legend interface).
+                    # Will happen if the animator attempts to set as visible
+                    # a no longer existing layer (i.e. if the user removes
+                    # that layer or group from the legend interface).
                     self.pause()
-                    self.errorSignal.emit("A layer for this animation was not found.\nWas it removed?"\
-                                          " Please, click\nagain on prepare animation to fix this issue.")
-                    QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                    self.errorSignal.emit(
+                        "A layer for this animation was not found.\nWas it removed?"
+                        " Please, click\nagain on prepare animation to fix this issue."
+                    )
+                    QgsMessageLog.logMessage(
+                        traceback.format_exc(),
+                        "THREDDS Explorer",
+                        QgsMessageLog.CRITICAL,
+                    )
                 self.framesShown.append(layer)
             except KeyError:
-                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-                iface.messageBar().pushMessage("THREDDS Explorer", "Connection error.", level=Qgis.Critical)
+                # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage(
+                    "THREDDS Explorer", "Connection error.", level=Qgis.Critical
+                )
                 continue
 
-        #print("MAP SEARCH FINISHED")
+        # print("MAP SEARCH FINISHED")
         try:
-            nextFrameToBeDisplayedIndex = \
-                abs((self.animationBeginTime - self.nextFrame).total_seconds())/self.timeDeltaPerFrame.total_seconds()
+            nextFrameToBeDisplayedIndex = (
+                abs((self.animationBeginTime - self.nextFrame).total_seconds())
+                / self.timeDeltaPerFrame.total_seconds()
+            )
         except TypeError:
-            #Will happen if this animation is reset while running.
+            # Will happen if this animation is reset while running.
             self.pause()
             return
 
-        #print("next frame to show int: "+str(nextFrameToBeDisplayedIndex))
+        # print("next frame to show int: "+str(nextFrameToBeDisplayedIndex))
         self.newFrameShown.emit((nextFrameToBeDisplayedIndex, str(self.nextFrame)))
         self.nextFrame = self.nextFrame + self.timeDeltaPerFrame
 
     def setCurrentFrame(self, intFramePosition):
         """Sets the animation in the specified frame."""
 
-        timeDelta = timedelta(seconds=intFramePosition * self.timeDeltaPerFrame.total_seconds())
+        timeDelta = timedelta(
+            seconds=intFramePosition * self.timeDeltaPerFrame.total_seconds()
+        )
         self.nextFrame = self.animationBeginTime + timeDelta
         if self.paused:
-            #If the animation is paused, we will manually
-            #trigger a new layer draw.
+            # If the animation is paused, we will manually
+            # trigger a new layer draw.
             self.onNextFrameRequested()
 
     def setFrameRate(self, millisecondsPerFrame):
         self.playbackSpeed = millisecondsPerFrame
         if not self.paused:
-            #If the animation is running, we will stop and restart it
-            #so it uses our new framerate.
+            # If the animation is running, we will stop and restart it
+            # so it uses our new framerate.
             self.pause()
             self.play()
 
@@ -213,7 +241,7 @@ class Controller(QObject):
         :type  timedeltaMaxDeviation: datetime.timedelta
         """
         self.timeDeviationTolerance = timedeltaMaxDeviation
-        #print("Tolerance = "+str(self.timeDeviationTolerance))
+        # print("Tolerance = "+str(self.timeDeviationTolerance))
 
     def setTimeDeltaPerFrame(self, timeDelta):
         self.timeDeltaPerFrame = timeDelta
@@ -240,7 +268,10 @@ class Controller(QObject):
             # be through a controller which generates an AnimationLayer.
             # Other supported layers missing those attributes should be handled separately.
             # TODO: Refactor this WMS/WCS layer fabrication through an external controller, as TESEO one, sort of...
-            if animationLayer.getAnimationData() and animationLayer.getAnimationLegendGroups():
+            if (
+                animationLayer.getAnimationData()
+                and animationLayer.getAnimationLegendGroups()
+            ):
                 otherLayers.append(animationLayer)
             elif animationLayer.getService() == "WMS":
                 wmsLayers.append(animationLayer)
@@ -252,8 +283,9 @@ class Controller(QObject):
         # retrieval attempt (begin, end), and four per WMS animationLayer
         # retrieval attempt (two per range check, one to begin
         # retrieving the animationLayer itself, one when it finishes)
-        self.maxProgress = 2*sum([len(x.getTimes()) for x in wcsLayers]) \
-                         + 3*sum([len(x.getTimes()) for x in wmsLayers])
+        self.maxProgress = 2 * sum([len(x.getTimes()) for x in wcsLayers]) + 3 * sum(
+            [len(x.getTimes()) for x in wmsLayers]
+        )
 
         for animationLayer in otherLayers:
             if animationLayer.getAnimationLegendGroups():
@@ -261,17 +293,23 @@ class Controller(QObject):
                 self.animationElements.append(animationLayer.getAnimationData())
                 self.updateTimeRange(animationLayer.getAnimationData().frameData.keys())
 
-        self.maxAnimationGroupsToBeCreated = len(wmsLayers) + len(wcsLayers) + len(otherLayers)
+        self.maxAnimationGroupsToBeCreated = (
+            len(wmsLayers) + len(wcsLayers) + len(otherLayers)
+        )
 
         if len(wmsLayers):
-            threading.Thread(target=self.createMultipleWMSAnimationElements, args=(wmsLayers,)).start()
+            threading.Thread(
+                target=self.createMultipleWMSAnimationElements, args=(wmsLayers,)
+            ).start()
 
         if len(wcsLayers):
-            threading.Thread(target=self.createMultipleWCSAnimationElements, args=(wcsLayers,)).start()
+            threading.Thread(
+                target=self.createMultipleWCSAnimationElements, args=(wcsLayers,)
+            ).start()
 
         # If no layers must be downloaded, it's over and ready:
         if not wmsLayers and not wcsLayers:
-            #print("READY WITHOUT LAYERS")
+            # print("READY WITHOUT LAYERS")
             self.animatorCreated()
             return
 
@@ -281,18 +319,20 @@ class Controller(QObject):
         try:
             for item in self.threadsInUse.keys():
                 item.requestCancellation()
-                #print("ITEM ALIVE: "+str((self.threadsInUse[item]).isAlive()))
+                # print("ITEM ALIVE: "+str((self.threadsInUse[item]).isAlive()))
                 self.threadsInUse.pop(item)
             self.statusSignal.emit("Operation cancelled.")
         except AttributeError:
             pass
 
     def animatorCreated(self):
-        #print("ANIMATOR CREATED --------------")
+        # print("ANIMATOR CREATED --------------")
         self.animatorReady.emit()
 
-        if self.errors == True :
-            self.errorSignal.emit("An error occured during the download.\nThe animation may have gaps.")
+        if self.errors == True:
+            self.errorSignal.emit(
+                "An error occured during the download.\nThe animation may have gaps."
+            )
 
     def getMaxProgressValue(self):
         """This will report the maximum number of operations/steps which will be done
@@ -307,18 +347,24 @@ class Controller(QObject):
         :type  animationLayerList: [AnimationLayer]
         """
         for item in animationLayerList:
-            worker = WCSDownloadWorkerThread(item.getMapObject().getWCS().getCapabilitiesURL(),
-                                 item.getTimes(),
-                                 item.getLayerName(),
-                                 item.getBBOX(),
-                                 parent=self)
+            worker = WCSDownloadWorkerThread(
+                item.getMapObject().getWCS().getCapabilitiesURL(),
+                item.getTimes(),
+                item.getLayerName(),
+                item.getBBOX(),
+                parent=self,
+            )
 
             baseLayerDictionary = worker.getLayerDict()
             animData = AnimationData(item.getLayerName(), baseLayerDictionary)
             item.setAnimationData(animData)
 
-            worker.WCSFrameStartsDownload.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
-            worker.WCSFrameFinishedDownload.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
+            worker.WCSFrameStartsDownload.connect(
+                self.animationGenerationStepDone.emit, Qt.DirectConnection
+            )
+            worker.WCSFrameFinishedDownload.connect(
+                self.animationGenerationStepDone.emit, Qt.DirectConnection
+            )
             worker.WCSProcessdone.connect(self.BatchWorkerThreadDone)
             worker.WCSMapDownloadFail.connect(self.WorkerThreadDownloadError)
             thread = threading.Thread(target=worker.run)
@@ -332,22 +378,31 @@ class Controller(QObject):
         """
         for item in animationLayerList:
             worker = WMSDownloadWorkerThread(
-                    capabilitiesURL=item.getMapObject().getWMS(),
-                    times=item.getTimes(),
-                    layerName=item.getLayerName(),
-                    style=item.getStyle(),
-                    bbox=item.getBBOX(),
-                    parent=self)
+                capabilitiesURL=item.getMapObject().getWMS(),
+                times=item.getTimes(),
+                layerName=item.getLayerName(),
+                style=item.getStyle(),
+                bbox=item.getBBOX(),
+                parent=self,
+            )
 
             baseLayerDictionary = worker.getLayerDict()
-            animData = AnimationData(item.getLayerName()+"_"+item.getStyle(), baseLayerDictionary)
+            animData = AnimationData(
+                item.getLayerName() + "_" + item.getStyle(), baseLayerDictionary
+            )
             item.setAnimationData(animData)
-            worker.WMSFrameStartsDownload.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
-            worker.WMSFrameFinishedDownload.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
-            worker.WMSSingleValueRangeProcessed.connect(self.animationGenerationStepDone.emit, Qt.DirectConnection)
+            worker.WMSFrameStartsDownload.connect(
+                self.animationGenerationStepDone.emit, Qt.DirectConnection
+            )
+            worker.WMSFrameFinishedDownload.connect(
+                self.animationGenerationStepDone.emit, Qt.DirectConnection
+            )
+            worker.WMSSingleValueRangeProcessed.connect(
+                self.animationGenerationStepDone.emit, Qt.DirectConnection
+            )
             worker.WMSprocessdone.connect(self.BatchWorkerThreadDone)
             worker.WMSMapDownloadFail.connect(self.WorkerThreadDownloadError)
-            thread = threading.Thread(target = worker.run)
+            thread = threading.Thread(target=worker.run)
             self.threadsInUse[worker] = thread
             thread.start()
 
@@ -369,36 +424,55 @@ class Controller(QObject):
         :type  workerObject: QObject
         """
         try:
-            self.threadsInUse.pop(workerObject) #We have to keep our list clean.
-            #We find what animationLayer object this dictionary
-            #is from
+            self.threadsInUse.pop(workerObject)  # We have to keep our list clean.
+            # We find what animationLayer object this dictionary
+            # is from
 
-            animationLayerObject = \
-             ([x for x in self.animationLayerObjectList if x.getAnimationData().frameData == layerDict])[0]
+            animationLayerObject = (
+                [
+                    x
+                    for x in self.animationLayerObjectList
+                    if x.getAnimationData().frameData == layerDict
+                ]
+            )[0]
 
             self.initializeAnimator(animationLayerObject)
-            groupName = animationLayerObject.getMapObject().getName()+"-"+animationLayerObject.getLayerName()
-            threading.Thread(target = self.addPendingLayerGroupRequest,
-                             args = (animationLayerObject,
-                                     groupName)).start()
+            groupName = (
+                animationLayerObject.getMapObject().getName()
+                + "-"
+                + animationLayerObject.getLayerName()
+            )
+            threading.Thread(
+                target=self.addPendingLayerGroupRequest,
+                args=(animationLayerObject, groupName),
+            ).start()
         except KeyError:
-            #Might happen if a thread is cancelled in the last frame download,
-            #as it'll already have been queued for removal from the threadsInUse dict
+            # Might happen if a thread is cancelled in the last frame download,
+            # as it'll already have been queued for removal from the threadsInUse dict
             pass
 
     @pyqtSlot(int, str)
     def WorkerThreadDownloadError(self, numberOfFailedDownloads, layerName):
-        self.errorSignal.emit("Warning: "+str(numberOfFailedDownloads)+" frames failed to be downloaded from layer \n"
-                              +layerName+". The resulting animation\nmay have gaps.")
+        self.errorSignal.emit(
+            "Warning: "
+            + str(numberOfFailedDownloads)
+            + " frames failed to be downloaded from layer \n"
+            + layerName
+            + ". The resulting animation\nmay have gaps."
+        )
 
     def initializeAnimator(self, animationLayerObject):
         animationData = animationLayerObject.getAnimationData()
         self.animationElements.append(animationData)
-        self.updateTimeRange(animationData.frameData.keys()) #We update the list of times covered by our frames
+        self.updateTimeRange(
+            animationData.frameData.keys()
+        )  # We update the list of times covered by our frames
 
     def addExternalTimeLayer(self):
         self.addLayerMenu = AnimationOtherLayerManager.AnimationOtherLayerManager(self)
-        self.addLayerMenu.animationLayerCreated.connect(self.addNewExternalAnimatedLayer)
+        self.addLayerMenu.animationLayerCreated.connect(
+            self.addNewExternalAnimatedLayer
+        )
         self.addLayerMenu.show()
 
     @pyqtSlot(object)
@@ -413,15 +487,19 @@ class Controller(QObject):
         if newElements == None or len(newElements) == 0:
             return
 
-        if self.animationBeginTime is None \
-        or self.animationBeginTime > orderedElements[0]:
+        if (
+            self.animationBeginTime is None
+            or self.animationBeginTime > orderedElements[0]
+        ):
             self.animationBeginTime = orderedElements[0]
 
-        if self.animationEndTime is None \
-        or self.animationEndTime < orderedElements[len(orderedElements)-1]:
-            self.animationEndTime = orderedElements[len(orderedElements)-1]
+        if (
+            self.animationEndTime is None
+            or self.animationEndTime < orderedElements[len(orderedElements) - 1]
+        ):
+            self.animationEndTime = orderedElements[len(orderedElements) - 1]
 
-    @pyqtSlot(AnimationLayer,str)
+    @pyqtSlot(AnimationLayer, str)
     def addPendingLayerGroupRequest(self, animationLayerObject, groupName):
         while len(self.threadsInUse.keys()) > 0:
             time.sleep(0.5)
@@ -432,7 +510,7 @@ class Controller(QObject):
         groupifier = LayerGroupifier(layerList, groupName)
         groupifier.statusSignal.connect(self.statusSignal)
         groupifier.groupifyComplete.connect(self._newLegendGroupReady)
-        #We assign the generated group reference to this animationLayer object
+        # We assign the generated group reference to this animationLayer object
         animationLayerObject.setAnimationLegendGroups(groupifier.getGeneratedGroup())
         groupifier.groupify()
 

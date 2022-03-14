@@ -13,6 +13,7 @@ from qgis.core import QgsRasterLayer
 from ..BoundingBoxInfo import BoundingBox
 from ...utilities import Utilities
 
+
 class WCScoverage(object):
     """Base model to store WCS coverage information.
     It includes the coverage name and time dimensions
@@ -52,6 +53,7 @@ class WCSparser(QObject):
     """Parses information from WCS services and creates objects which
     ease any operations we need to do with them.
     """
+
     standardMessage = pyqtSignal(str)
 
     def __init__(self, URLcapabilities):
@@ -64,20 +66,28 @@ class WCSparser(QObject):
         self.availableCoverages = None
         self.URLcapabilities = URLcapabilities
         self.namespace = "{http://www.opengis.net/wcs}"
-        self.gml="{http://www.opengis.net/gml}"
-        urlBase = self.URLcapabilities.partition('?')[0] #Nos quedamos con la parte de URL
-        self.urlDescribeCoverage = (urlBase + '?'
-                                    + 'service=WCS'
-                                    + '&version=1.0.0'
-                                    + '&request=DescribeCoverage')
-        self.urlGetCoverage = (urlBase + '?'
-                            + 'service=WCS'
-                            + '&version=1.0.0'
-                            + '&request=GetCoverage'
-                            + '&coverage={coverageName}'
-                            + '&TIME={timeCode}'
-                            + '&format=GeoTIFF'
-                            + '&BBOX={BBOX}')
+        self.gml = "{http://www.opengis.net/gml}"
+        urlBase = self.URLcapabilities.partition("?")[
+            0
+        ]  # Nos quedamos con la parte de URL
+        self.urlDescribeCoverage = (
+            urlBase
+            + "?"
+            + "service=WCS"
+            + "&version=1.0.0"
+            + "&request=DescribeCoverage"
+        )
+        self.urlGetCoverage = (
+            urlBase
+            + "?"
+            + "service=WCS"
+            + "&version=1.0.0"
+            + "&request=GetCoverage"
+            + "&coverage={coverageName}"
+            + "&TIME={timeCode}"
+            + "&format=GeoTIFF"
+            + "&BBOX={BBOX}"
+        )
 
     def getAvailableCoverages(self):
         """Returns the cached coverage information for this map, or if
@@ -108,9 +118,9 @@ class WCSparser(QObject):
                   image from, using the given details.
         :rtype:   str
         """
-        return self.urlGetCoverage.format(coverageName=nameCoverage,
-            timeCode=coverageTime,
-            BBOX=str(boundingBox))
+        return self.urlGetCoverage.format(
+            coverageName=nameCoverage, timeCode=coverageTime, BBOX=str(boundingBox)
+        )
 
     def generateLayer(self, nameCoverage, coverageTime, boundingBox=None):
         """Generates a raster layer for QGIS.
@@ -125,10 +135,13 @@ class WCSparser(QObject):
         :rtype:   QgsRasterLayer
         """
         url = self.generateURLForGeoTIFF(nameCoverage, coverageTime, boundingBox)
-        layerName = "{ct}_{nc}-{id}".format(ct=coverageTime, nc=nameCoverage, id=uuid.uuid4())
+        layerName = "{ct}_{nc}-{id}".format(
+            ct=coverageTime, nc=nameCoverage, id=uuid.uuid4()
+        )
 
         if Utilities.is_linux():
             import requests
+
             with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as f:
                 r = requests.get(url, stream=True)
                 with open(f.name, "wb") as g:
@@ -144,7 +157,7 @@ class WCSparser(QObject):
         else:
             msg = "Couldn't create a valid layer."
             self.standardMessage.emit(msg)
-            #raise StandardError("Couldn't create a valid layer.")
+            # raise StandardError("Couldn't create a valid layer.")
 
     def generateLayerFromGeoTIFFURL(self, geoTiffUrl, layerName):
         """Generates a new layer based on the GeoTIFF URL provided for the WCS service.
@@ -163,6 +176,7 @@ class WCSparser(QObject):
 
         if Utilities.is_linux():
             import requests
+
             with tempfile.NamedTemporaryFile(suffix=".tiff", delete=False) as f:
                 r = requests.get(geoTiffUrl, stream=True)
                 with open(f.name, "wb") as g:
@@ -190,19 +204,27 @@ class WCSparser(QObject):
         treeCoverages = ET.ElementTree(xml)
         rootCoverages = treeCoverages.getroot()
 
-        coveragesOffered = rootCoverages.findall('.//{0}CoverageOffering'.format(self.namespace))
+        coveragesOffered = rootCoverages.findall(
+            ".//{0}CoverageOffering".format(self.namespace)
+        )
         for coverage in coveragesOffered:
-            nombreCoverage = coverage.find('.//{0}name'.format(self.namespace)).text
+            nombreCoverage = coverage.find(".//{0}name".format(self.namespace)).text
             coverageTimes = []
 
-            patt = './/{0}domainSet//{0}temporalDomain//{1}timePosition'.format(self.namespace, self.gml)
+            patt = ".//{0}domainSet//{0}temporalDomain//{1}timePosition".format(
+                self.namespace, self.gml
+            )
             for item in coverage.findall(patt):
                 coverageTimes.append(item.text)
 
             coverageObject = WCScoverage(nombreCoverage, coverageTimes)
 
-            crs = (coverage.find('.//{0}lonLatEnvelope'.format(self.namespace)).attrib)["srsName"]
-            bbElements = coverage.findall('.//{0}lonLatEnvelope//{1}pos'.format(self.namespace, self.gml))
+            crs = (coverage.find(".//{0}lonLatEnvelope".format(self.namespace)).attrib)[
+                "srsName"
+            ]
+            bbElements = coverage.findall(
+                ".//{0}lonLatEnvelope//{1}pos".format(self.namespace, self.gml)
+            )
 
             # We will retrieve two gml:pos elements here. The first one will contain
             # the west and south elements separated by a blank space, and the second
@@ -219,4 +241,3 @@ class WCSparser(QObject):
 
             coverageObject.setBoundingBoxInfo(boundingBox)
             self.availableCoverages.append(coverageObject)
-

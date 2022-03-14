@@ -10,16 +10,22 @@ from PyQt5 import QtCore, QtWidgets
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
+
     def _fromUtf8(s):
         return s
 
+
 try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class Ui_serverListDialog(object):
     def setupUi(self, serverListDialog):
@@ -54,7 +60,9 @@ class Ui_serverListDialog(object):
         self.buttonRemove = QtWidgets.QPushButton(serverListDialog)
         self.buttonRemove.setObjectName(_fromUtf8("buttonRemove"))
         self.buttonLayout.addWidget(self.buttonRemove)
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.buttonLayout.addItem(spacerItem)
         self.horizontalLayout.addLayout(self.buttonLayout)
         self.baseVerticalLayout.addLayout(self.horizontalLayout)
@@ -64,12 +72,12 @@ class Ui_serverListDialog(object):
         QtCore.QMetaObject.connectSlotsByName(serverListDialog)
 
     def retranslateUi(self, serverListDialog):
-        serverListDialog.setWindowTitle(_translate("serverListDialog", "Available server settings", None))
+        serverListDialog.setWindowTitle(
+            _translate("serverListDialog", "Available server settings", None)
+        )
         self.buttonLoadData.setText(_translate("serverListDialog", "Load data", None))
         self.buttonLoadData.setShortcut(_translate("serverListDialog", "Alt+L", None))
         self.buttonAdd.setText(_translate("serverListDialog", "Add server...", None))
         self.buttonAdd.setShortcut(_translate("serverListDialog", "Alt+A", None))
         self.buttonRemove.setText(_translate("serverListDialog", "Remove server", None))
         self.buttonRemove.setShortcut(_translate("serverListDialog", "Alt+R", None))
-
-

@@ -38,7 +38,10 @@ from .libvisor.persistence import ServerDataPersistenceManager
 from .libvisor.utilities.LayerLegendGroupifier import LayerGroupifier
 from .libvisor.providersmanagers.BoundingBoxInfo import BoundingBox
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'THREDDS_Explorer_dockwidget_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "THREDDS_Explorer_dockwidget_base.ui")
+)
+
 
 class Visor(QtWidgets.QDockWidget, FORM_CLASS):
     """
@@ -54,14 +57,16 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
 
     groupAssignmentLock = RLock()
 
-    def __init__(self, showEmptyDatasetNodes = False, parent=None):
+    def __init__(self, showEmptyDatasetNodes=False, parent=None):
         """Constructor."""
 
         super(Visor, self).__init__(parent)
         self.setupUi(self)
 
         self.controller = VisorController.VisorController()
-        self.controller.threddsServerMapObjectRetrieved.connect(self.onNewDatasetsAvailable)
+        self.controller.threddsServerMapObjectRetrieved.connect(
+            self.onNewDatasetsAvailable
+        )
         self.controller.threddsDataSetUpdated.connect(self.onDataSetUpdated)
         self.controller.mapImageRetrieved.connect(self.showNewImage)
         self.controller.standardMessage.connect(self.postInformationMessageToUser)
@@ -69,33 +74,45 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         self.controller.mapInfoRetrieved.connect(self._onMapInfoReceivedFromController)
         self.controller.batchDownloadFinished.connect(self.createLayerGroup)
 
-        self.showEmptyDatasetNodes = showEmptyDatasetNodes # TODO: self-explanatory...
-        self.combo_dataset_list.currentIndexChanged[str].connect(self._onDataSetItemChanged)
+        self.showEmptyDatasetNodes = showEmptyDatasetNodes  # TODO: self-explanatory...
+        self.combo_dataset_list.currentIndexChanged[str].connect(
+            self._onDataSetItemChanged
+        )
         self.tree_widget.itemClicked.connect(self._onMapTreeWidgetItemClicked)
         self.tree_widget.itemExpanded.connect(self._onMapTreeWidgetItemExpanded)
 
         self.tabWidget.currentChanged.connect(self.runWhenTabChange)
 
-#         self.connect(self.combo_wcs_coverage, Signal("currentIndexChanged(const QString&)"),
-#                 self._onCoverageSelectorItemChanged)
-#         self.connect(self.combo_wms_layer, Signal("currentIndexChanged(const QString&)"),
-#                 self._onWMSLayerSelectorItemChanged)
-#         self.connect(self.combo_wms_style_type, Signal("currentIndexChanged(const QString&)"),
-#                 self._onWMSStyleTypeSelectorItemChanged)
-#         self.connect(self.combo_wms_time, Signal("currentIndexChanged(int)"), self._onWMSFirstTimeChanged)
-#         self.connect(self.combo_wcs_time, Signal("currentIndexChanged(int)"), self._onWCSFirstTimeChanged)
-        
-        self.combo_wcs_coverage.currentIndexChanged[str].connect(self._onCoverageSelectorItemChanged)
-        self.combo_wms_layer.currentIndexChanged[str].connect(self._onWMSLayerSelectorItemChanged)
-        self.combo_wms_style_type.currentIndexChanged[str].connect(self._onWMSStyleTypeSelectorItemChanged)
-        self.combo_wms_time.currentIndexChanged[int].connect(self._onWMSFirstTimeChanged)
-        self.combo_wcs_time.currentIndexChanged[int].connect(self._onWCSFirstTimeChanged)
-        
+        #         self.connect(self.combo_wcs_coverage, Signal("currentIndexChanged(const QString&)"),
+        #                 self._onCoverageSelectorItemChanged)
+        #         self.connect(self.combo_wms_layer, Signal("currentIndexChanged(const QString&)"),
+        #                 self._onWMSLayerSelectorItemChanged)
+        #         self.connect(self.combo_wms_style_type, Signal("currentIndexChanged(const QString&)"),
+        #                 self._onWMSStyleTypeSelectorItemChanged)
+        #         self.connect(self.combo_wms_time, Signal("currentIndexChanged(int)"), self._onWMSFirstTimeChanged)
+        #         self.connect(self.combo_wcs_time, Signal("currentIndexChanged(int)"), self._onWCSFirstTimeChanged)
+
+        self.combo_wcs_coverage.currentIndexChanged[str].connect(
+            self._onCoverageSelectorItemChanged
+        )
+        self.combo_wms_layer.currentIndexChanged[str].connect(
+            self._onWMSLayerSelectorItemChanged
+        )
+        self.combo_wms_style_type.currentIndexChanged[str].connect(
+            self._onWMSStyleTypeSelectorItemChanged
+        )
+        self.combo_wms_time.currentIndexChanged[int].connect(
+            self._onWMSFirstTimeChanged
+        )
+        self.combo_wcs_time.currentIndexChanged[int].connect(
+            self._onWCSFirstTimeChanged
+        )
+
         self.button_req_map.clicked.connect(self._onbuttonReqMapClicked)
-        #self.actionToggleAlwaysOnTop.toggled.connect(self._onAlwaysOnTopPrefsChanged)
+        # self.actionToggleAlwaysOnTop.toggled.connect(self._onAlwaysOnTopPrefsChanged)
         self.buttonManageServers.clicked.connect(self._onManageServersRequested)
         self.button_req_animation.clicked.connect(self.toggleAnimationMenu)
-        
+
         # We add a status bar to this QDockWidget:
         self.statusbar = QStatusBar()
         self.gridLayout.addWidget(self.statusbar)
@@ -143,7 +160,7 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         """Method to show GDAL version warning if need be."""
 
         # If OS is linux:
-        if sys.platform.startswith('linux'):
+        if sys.platform.startswith("linux"):
             # Show warning only if WCS tab selected:
             if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WCS):
                 self.createGDALWindowWarning()
@@ -157,14 +174,20 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         if persistenceManager.show_GDAL_error:
             try:
                 from osgeo import gdal
+
                 if int(gdal.VersionInfo()) < 2000000:
                     # Show warning window, and allow for "don't show again":
-                    message  = "Your GDAL libraries version is outdated. Versions\n"
+                    message = "Your GDAL libraries version is outdated. Versions\n"
                     message += "under 2.0 are not guaranteed to work when\n"
                     message += "attempting to load WCS Layers.\nPlease update GDAL."
 
-                    reply = QtWidgets.QMessageBox.question(self, 'GDAL: Unsupported version found',
-                            (message), "Close", "Don't show again")
+                    reply = QtWidgets.QMessageBox.question(
+                        self,
+                        "GDAL: Unsupported version found",
+                        (message),
+                        "Close",
+                        "Don't show again",
+                    )
 
                     # If requested to, record setting not to show warning again:
                     if reply == 1:
@@ -172,13 +195,18 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
 
             except ImportError:
                 # Show warning window, and allow for "don't show again":
-                message  = "Your GDAL libraries version could not be read"
+                message = "Your GDAL libraries version could not be read"
                 message += "Versions under 2.0 are not guaranteed to work when\n"
                 message += "attempting to load WCS Layers. If you have any issues,\n"
                 message += "please update GDAL."
 
-                reply = QtWidgets.QMessageBox.question(self, 'GDAL: Unsupported version found',
-                        (message), "Close", "Don't show again")
+                reply = QtWidgets.QMessageBox.question(
+                    self,
+                    "GDAL: Unsupported version found",
+                    (message),
+                    "Close",
+                    "Don't show again",
+                )
 
                 # If requested to, record setting not to show warning again:
                 if reply == 1:
@@ -193,11 +221,13 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         create/add it to a layout here so... oh well..."""
 
         if self.uiAnimation is None:
-            self.uiAnimation = AnimationFrame(parent = self)
+            self.uiAnimation = AnimationFrame(parent=self)
             self.uiAnimation.errorSignal.connect(self.postCriticalErrorToUser)
 
-            self.controller.mapInfoRetrieved.connect(self.uiAnimation.setAnimationInformation)
-            if None is not self.currentMap :
+            self.controller.mapInfoRetrieved.connect(
+                self.uiAnimation.setAnimationInformation
+            )
+            if None is not self.currentMap:
                 self.uiAnimation.setAnimationInformation(self.currentMap)
 
             self.uiAnimation.show()
@@ -221,7 +251,7 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         self.combo_wcs_coverage.clear()
         self.combo_wcs_time.clear()
         self.combo_wcs_time_last.clear()
-        self.WCSBoundingBoxInfo.setText("No Bounding Box or CRS information available." )
+        self.WCSBoundingBoxInfo.setText("No Bounding Box or CRS information available.")
         self.WCS_northBound.setText("East: No info")
         self.WCS_southBound.setText("West: No info")
         self.WCS_eastBound.setText("North: No info")
@@ -252,11 +282,13 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         for dataSet in inDataSets:
             StringList.append(dataSet.getName())
 
-        self.setWindowTitle("THREDDS Explorer - Connected: "+serverName)
+        self.setWindowTitle("THREDDS Explorer - Connected: " + serverName)
         self.combo_dataset_list.clear()
         self.combo_dataset_list.addItems(StringList)
         self.combo_dataset_list.setCurrentIndex(0)
-        self.postInformationMessageToUser("Dataset list updated: "+str(len(StringList))+ " elements.")
+        self.postInformationMessageToUser(
+            "Dataset list updated: " + str(len(StringList)) + " elements."
+        )
         self.clearData()
 
     @pyqtSlot(str)
@@ -293,11 +325,13 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         chosen combobox when the item selected changes."""
 
         self.tree_widget.clear()
-        self.datasetInUse = self.controller.getSingleDataset(self.combo_dataset_list.currentText())
+        self.datasetInUse = self.controller.getSingleDataset(
+            self.combo_dataset_list.currentText()
+        )
         if self.datasetInUse is None:
-            return #If no dataset is available to be shown, we will create no tree.
+            return  # If no dataset is available to be shown, we will create no tree.
 
-        rootItem = self.tree_widget.invisibleRootItem();
+        rootItem = self.tree_widget.invisibleRootItem()
         newItem = QtWidgets.QTreeWidgetItem(rootItem, [self.datasetInUse.getName()])
         rootItem.addChild(self._createHierarchy(self.datasetInUse, newItem))
 
@@ -320,36 +354,48 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
                 treeItemParent.removeChild(child)
             else:
                 itemsAlreadyAddedToElement.append(child)
-            i = i+1
-        elementsAlreadyInTreeItemParent = [x.text(0) for x in itemsAlreadyAddedToElement]
+            i = i + 1
+        elementsAlreadyInTreeItemParent = [
+            x.text(0) for x in itemsAlreadyAddedToElement
+        ]
         if dataSet != None:
             for mapElement in dataSet.getAvailableMapList():
                 if mapElement.getName() in elementsAlreadyInTreeItemParent:
                     continue
                 else:
-                    newItem = QtWidgets.QTreeWidgetItem(treeItemParent, [mapElement.getName()])
+                    newItem = QtWidgets.QTreeWidgetItem(
+                        treeItemParent, [mapElement.getName()]
+                    )
                     treeItemParent.addChild(newItem)
 
             subSets = dataSet.getSubSets()
             if len(subSets) == 0:
-                #We add a dummy element so the element open icon is created..
+                # We add a dummy element so the element open icon is created..
                 newItem = QtWidgets.QTreeWidgetItem(treeItemParent)
-                newItem.setText(0,"No subsets found")
+                newItem.setText(0, "No subsets found")
                 treeItemParent.addChild(newItem)
             else:
                 for dataset in subSets:
-                    #If an item with the same name as this dataset is found as a subchild
-                    #of the parent item, we will use it to build our tree. Otherwise, we
-                    #create a new one and append it.
-                    itemList = ([x for x in itemsAlreadyAddedToElement if x.text(0) == dataset.getName()])
+                    # If an item with the same name as this dataset is found as a subchild
+                    # of the parent item, we will use it to build our tree. Otherwise, we
+                    # create a new one and append it.
+                    itemList = [
+                        x
+                        for x in itemsAlreadyAddedToElement
+                        if x.text(0) == dataset.getName()
+                    ]
                     if itemList is None or len(itemList) == 0:
-                        item = QtWidgets.QTreeWidgetItem(treeItemParent, [dataset.getName()])
+                        item = QtWidgets.QTreeWidgetItem(
+                            treeItemParent, [dataset.getName()]
+                        )
                         treeItemParent.addChild(self._createHierarchy(dataset, item))
                     else:
                         item = itemList[0]
                         self._createHierarchy(dataset, item)
         else:
-            self.postCriticalErrorToUser("WARNING: Attempted to add a null dataset to view.")
+            self.postCriticalErrorToUser(
+                "WARNING: Attempted to add a null dataset to view."
+            )
 
     def _onMapTreeWidgetItemClicked(self, mQTreeWidgetItem, column):
         """
@@ -363,22 +409,26 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         if None is mQTreeWidgetItem or None is mQTreeWidgetItem.parent():
             return
 
-        self.controller.getMapObject(str(mQTreeWidgetItem.text(0)), str(mQTreeWidgetItem.parent().text(0)), self.datasetInUse)
+        self.controller.getMapObject(
+            str(mQTreeWidgetItem.text(0)),
+            str(mQTreeWidgetItem.parent().text(0)),
+            self.datasetInUse,
+        )
 
     @pyqtSlot(object)
     def _onMapInfoReceivedFromController(self, mapInfoObject):
-        #print("_onMapInfoReceivedFromController 1"+str(mapInfoObject))
+        # print("_onMapInfoReceivedFromController 1"+str(mapInfoObject))
         self.currentMap = mapInfoObject
-        #print("_onMapInfoReceivedFromController 2"+str(self.currentMap))
+        # print("_onMapInfoReceivedFromController 2"+str(self.currentMap))
         if self.currentMap is not None:
-            #WCS Data update
+            # WCS Data update
             self.currentCoverages = self.controller.getWCSCoverages(self.currentMap)
             if self.currentCoverages is not None:
                 for c in self.currentCoverages:
                     self.combo_wcs_coverage.addItem(c.getName())
             else:
                 self.combo_wcs_coverage.addItem("No data available.")
-            #WMS Data update
+            # WMS Data update
             self.currentWMSMapInfo = self.controller.getWMSMapInfo(self.currentMap)
             if self.currentWMSMapInfo is not None:
                 for l in self.currentWMSMapInfo.getLayers():
@@ -392,7 +442,8 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         recover it's data and present it to the user.
         """
         setToUpdate = self.datasetInUse.searchSubsetsByName(
-                          str(mQTreeWidgetItem.text(0)), exactMatch=True)
+            str(mQTreeWidgetItem.text(0)), exactMatch=True
+        )
         if setToUpdate is not None and len(setToUpdate) > 0:
             self.controller.mapDataSet(setToUpdate[0], depth=1)
 
@@ -402,7 +453,9 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         dataset object and it's new data.
         """
         if dataSetObject.getParent() is not None:
-            parent = self.tree_widget.findItems(dataSetObject.getName(), Qt.MatchRecursive)
+            parent = self.tree_widget.findItems(
+                dataSetObject.getName(), Qt.MatchRecursive
+            )
         self._createHierarchy(dataSetObject, parent[0])
 
     @pyqtSlot(str)
@@ -416,14 +469,19 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.combo_wcs_time.clear()
         if self.currentCoverages is not None:
-            coverageElement = [ x for x in self.currentCoverages if x.getName() == str(QStringItem) ]
+            coverageElement = [
+                x for x in self.currentCoverages if x.getName() == str(QStringItem)
+            ]
             if None is not coverageElement or len(coverageElement) > 0:
                 try:
                     self.wcsAvailableTimes = coverageElement[0].getTiempos()
                     self.combo_wcs_time.addItems(self.wcsAvailableTimes)
                     BBinfo = coverageElement[0].getBoundingBoxInfo()
-                    self.WCSBoundingBoxInfo.setText("CRS = "+BBinfo.getCRS()
-                                                +"\n\n Bounding Box information (decimal degrees):" )
+                    self.WCSBoundingBoxInfo.setText(
+                        "CRS = "
+                        + BBinfo.getCRS()
+                        + "\n\n Bounding Box information (decimal degrees):"
+                    )
                     self.WCS_eastBound.setText(BBinfo.getEast())
                     self.WCS_westBound.setText(BBinfo.getWest())
                     self.WCS_northBound.setText(BBinfo.getNorth())
@@ -439,19 +497,28 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
 
         # Only one should be returned here.
         if self.currentWMSMapInfo is not None:
-            layerSelectedObject =  [ x for x in self.currentWMSMapInfo.getLayers()
-                                    if x.getName() == str(QStringItem) ]
+            layerSelectedObject = [
+                x
+                for x in self.currentWMSMapInfo.getLayers()
+                if x.getName() == str(QStringItem)
+            ]
 
             if layerSelectedObject is not None and len(layerSelectedObject) == 1:
                 self.wmsAvailableTimes = layerSelectedObject[0].getTimes()
                 self.combo_wms_time.addItems(self.wmsAvailableTimes)
                 self.wmsAvailableStyles = layerSelectedObject[0].getStyles()
-                self.combo_wms_style_type.addItems(list({(x.getName().split(r"/"))[0]
-                                                    for x in self.wmsAvailableStyles}))
+                self.combo_wms_style_type.addItems(
+                    list(
+                        {(x.getName().split(r"/"))[0] for x in self.wmsAvailableStyles}
+                    )
+                )
 
                 BBinfo = layerSelectedObject[0].getBoundingBoxInfo()
-                self.WMSBoundingBoxInfo.setText("CRS = "+BBinfo.getCRS()
-                                                +"\n\n Bounding Box information (decimal degrees):" )
+                self.WMSBoundingBoxInfo.setText(
+                    "CRS = "
+                    + BBinfo.getCRS()
+                    + "\n\n Bounding Box information (decimal degrees):"
+                )
                 self.WMS_eastBound.setText(BBinfo.getEast())
                 self.WMS_westBound.setText(BBinfo.getWest())
                 self.WMS_northBound.setText(BBinfo.getNorth())
@@ -460,27 +527,31 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
     @pyqtSlot(str)
     def _onWMSStyleTypeSelectorItemChanged(self, qstringitem):
         self.combo_wms_style_palette.clear()
-        self.combo_wms_style_palette.addItems(list({(x.getName().split(r"/"))[1]
-                                                    for x in self.wmsAvailableStyles
-                                                    if str(qstringitem) in x.getName()}))
+        self.combo_wms_style_palette.addItems(
+            list(
+                {
+                    (x.getName().split(r"/"))[1]
+                    for x in self.wmsAvailableStyles
+                    if str(qstringitem) in x.getName()
+                }
+            )
+        )
 
     @pyqtSlot(int)
     def _onWCSFirstTimeChanged(self, position):
-        #print("self.wcsAvailableTimes"+str((sorted(self.wcsAvailableTimes))))
-        #print("WCS INDEX: "+str(position))
+        # print("self.wcsAvailableTimes"+str((sorted(self.wcsAvailableTimes))))
+        # print("WCS INDEX: "+str(position))
         self.combo_wcs_time_last.clear()
-        #print self.wcsAvailableTimes[position:]
-        self.combo_wcs_time_last.addItems(
-          (sorted(self.wcsAvailableTimes))[position:])
+        # print self.wcsAvailableTimes[position:]
+        self.combo_wcs_time_last.addItems((sorted(self.wcsAvailableTimes))[position:])
 
     @pyqtSlot(int)
     def _onWMSFirstTimeChanged(self, position):
-        #print("self.wmsAvailableTimes"+str((sorted(self.wmsAvailableTimes))))
-        #print("WMS INDEX: "+str(position))
+        # print("self.wmsAvailableTimes"+str((sorted(self.wmsAvailableTimes))))
+        # print("WMS INDEX: "+str(position))
         self.combo_wms_time_last.clear()
-        #print self.wmsAvailableTimes[position:]
-        self.combo_wms_time_last.addItems(
-          self.wmsAvailableTimes[position:])
+        # print self.wmsAvailableTimes[position:]
+        self.combo_wms_time_last.addItems(self.wmsAvailableTimes[position:])
 
     def _onbuttonReqMapClicked(self):
         """
@@ -488,19 +559,27 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         button to request a new map to be displayed,
         after selecting proper values in the rest of fields.
         """
-        self.postInformationMessageToUser("") # reset error display.
+        self.postInformationMessageToUser("")  # reset error display.
         if self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WCS):
             try:
-                selectedBeginTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time.currentText())
-                selectedFinishTimeIndex = self.wcsAvailableTimes.index(self.combo_wcs_time_last.currentText())+1
+                selectedBeginTimeIndex = self.wcsAvailableTimes.index(
+                    self.combo_wcs_time.currentText()
+                )
+                selectedFinishTimeIndex = (
+                    self.wcsAvailableTimes.index(self.combo_wcs_time_last.currentText())
+                    + 1
+                )
 
                 # We retrieve some information about the current selected map, useful
                 # to grab the actual CRS used by the map service. Should be changed if
                 # CRS is to be user-selectable later via dropdown menu or anything like
                 # that.
                 if self.currentCoverages is not None:
-                    coverageElement = [ x for x in self.currentCoverages if
-                            x.getName() == str(self.combo_wcs_coverage.currentText()) ]
+                    coverageElement = [
+                        x
+                        for x in self.currentCoverages
+                        if x.getName() == str(self.combo_wcs_coverage.currentText())
+                    ]
                 if None is not coverageElement or len(coverageElement) > 0:
                     try:
                         try:
@@ -509,8 +588,10 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
                             east = float(self.WCS_eastBound.text())
                             west = float(self.WCS_westBound.text())
                         except ValueError:
-                            self.postCriticalErrorToUser("Bounding box values were not valid."
-                            +"\nCheck only decimal numbers are used\n(example: 12.44)")
+                            self.postCriticalErrorToUser(
+                                "Bounding box values were not valid."
+                                + "\nCheck only decimal numbers are used\n(example: 12.44)"
+                            )
                             return
                         # We retrieve the bounding box CRS information from the
                         # requested coverage, and get the actual box values
@@ -523,34 +604,53 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
                         boundingBoxToDownload.setNorth(north)
                         boundingBoxToDownload.setSouth(south)
                         self.controller.asyncFetchWCSImageFile(
-                                    self.currentMap,
-                                    self.combo_wcs_coverage.currentText(),
-                                    self.wcsAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex],
-                                    boundingBox=boundingBoxToDownload)
+                            self.currentMap,
+                            self.combo_wcs_coverage.currentText(),
+                            self.wcsAvailableTimes[
+                                selectedBeginTimeIndex:selectedFinishTimeIndex
+                            ],
+                            boundingBox=boundingBoxToDownload,
+                        )
                     except IndexError:
                         pass
             except Exception as exc:
-                #self.postInformationMessageToUser("There was an error retrieving the WCS data.")
-                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-                iface.messageBar().pushMessage("THREDDS Explorer", "There was an error retrieving the WCS data.", level=Qgis.Critical)
+                # self.postInformationMessageToUser("There was an error retrieving the WCS data.")
+                # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage(
+                    "THREDDS Explorer",
+                    "There was an error retrieving the WCS data.",
+                    level=Qgis.Critical,
+                )
         elif self.tabWidget.currentIndex() == self.tabWidget.indexOf(self.tab_WMS):
             try:
-                selectedBeginTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time.currentText())
-                selectedFinishTimeIndex = self.wmsAvailableTimes.index(self.combo_wms_time_last.currentText())+1
-                style = self.combo_wms_style_type.currentText()+r"/"+self.combo_wms_style_palette.currentText()
+                selectedBeginTimeIndex = self.wmsAvailableTimes.index(
+                    self.combo_wms_time.currentText()
+                )
+                selectedFinishTimeIndex = (
+                    self.wmsAvailableTimes.index(self.combo_wms_time_last.currentText())
+                    + 1
+                )
+                style = (
+                    self.combo_wms_style_type.currentText()
+                    + r"/"
+                    + self.combo_wms_style_palette.currentText()
+                )
 
-                #We retrieve some information about the current selected map, useful
-                #to grab the actual CRS used by the map service. Should be changed if
-                #CRS is to be user-selectable later via dropdown menu or anything like
-                #that.
-                #Only one should be returned here.
+                # We retrieve some information about the current selected map, useful
+                # to grab the actual CRS used by the map service. Should be changed if
+                # CRS is to be user-selectable later via dropdown menu or anything like
+                # that.
+                # Only one should be returned here.
                 if self.currentWMSMapInfo is not None:
-                    layerSelectedObject =  [ x for x in self.currentWMSMapInfo.getLayers()
-                                            if x.getName() == str(self.combo_wms_layer.currentText())]
+                    layerSelectedObject = [
+                        x
+                        for x in self.currentWMSMapInfo.getLayers()
+                        if x.getName() == str(self.combo_wms_layer.currentText())
+                    ]
 
-                #We retrieve the bounding box CRS information from the
-                #requested coverage, and get the actual box values
-                #from the UI.
+                # We retrieve the bounding box CRS information from the
+                # requested coverage, and get the actual box values
+                # from the UI.
                 if None is not layerSelectedObject or len(layerSelectedObject) > 0:
                     try:
                         north = float(self.WMS_northBound.text())
@@ -558,8 +658,10 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
                         east = float(self.WMS_eastBound.text())
                         west = float(self.WMS_westBound.text())
                     except ValueError:
-                        self.postCriticalErrorToUser("Bounding box values were not valid."
-                        +"\nCheck only decimal numbers are used\n(example: 12.44)")
+                        self.postCriticalErrorToUser(
+                            "Bounding box values were not valid."
+                            + "\nCheck only decimal numbers are used\n(example: 12.44)"
+                        )
                         return
 
                     BBinfo = layerSelectedObject[0].getBoundingBoxInfo()
@@ -569,24 +671,39 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
                     boundingBoxToDownload.setWest(west)
                     boundingBoxToDownload.setNorth(north)
                     boundingBoxToDownload.setSouth(south)
-                    self.controller.asyncFetchWMSImageFile(self.currentMap, self.combo_wms_layer.currentText(), style, self.wmsAvailableTimes[selectedBeginTimeIndex:selectedFinishTimeIndex], boundingBox = boundingBoxToDownload)
+                    self.controller.asyncFetchWMSImageFile(
+                        self.currentMap,
+                        self.combo_wms_layer.currentText(),
+                        style,
+                        self.wmsAvailableTimes[
+                            selectedBeginTimeIndex:selectedFinishTimeIndex
+                        ],
+                        boundingBox=boundingBoxToDownload,
+                    )
             except Exception as exc:
                 print(exc)
-                #self.postInformationMessageToUser("There was an error retrieving the WMS data.")
-                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-                iface.messageBar().pushMessage("THREDDS Explorer", "There was an error retrieving the WMS data.", level=Qgis.Critical)
-
+                # self.postInformationMessageToUser("There was an error retrieving the WMS data.")
+                # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage(
+                    "THREDDS Explorer",
+                    "There was an error retrieving the WMS data.",
+                    level=Qgis.Critical,
+                )
 
     @pyqtSlot(list, str)
     def createLayerGroup(self, layerList, groupName):
         if layerList:
             groupifier = LayerGroupifier(layerList, groupName)
             groupifier.setSingleLayerSelectionModeInGroup(False)
-            groupifier.statusSignal.connect(self.postInformationMessageToUser, Qt.DirectConnection)
+            groupifier.statusSignal.connect(
+                self.postInformationMessageToUser, Qt.DirectConnection
+            )
             groupifier.groupifyComplete.connect(self._onNewLayerGroupGenerated)
             groupifier.groupify()
         else:
-            self.postInformationMessageToUser("There was a problem showing the time series.")
+            self.postInformationMessageToUser(
+                "There was a problem showing the time series."
+            )
 
     @pyqtSlot(QgsLayerTreeGroup, list)
     def _onNewLayerGroupGenerated(self, groupObject, layerList):
@@ -601,8 +718,10 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         :type  layerList: [QgsLayer]
         """
         if (layerList[0]).isValid():
-            #iface.legendInterface().setLayerVisible(layerList[0], True)
-            QgsProject.instance().layerTreeRoot().findLayer(layerList[0].id()).setItemVisibilityChecked(True)
+            # iface.legendInterface().setLayerVisible(layerList[0], True)
+            QgsProject.instance().layerTreeRoot().findLayer(
+                layerList[0].id()
+            ).setItemVisibilityChecked(True)
         else:
             self.postInformationMessageToUser("There was a problem showing a layer.")
 
@@ -617,7 +736,9 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
 
         """
 
-        self.postInformationMessageToUser("Layer '"+image[1]+"' ["+image[2]+"]retrieved")
+        self.postInformationMessageToUser(
+            "Layer '" + image[1] + "' [" + image[2] + "]retrieved"
+        )
         layer = image[0]
         if layer and layer.isValid():
             QgsMapLayerRegistry.instance().addMapLayer(layer)

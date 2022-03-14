@@ -12,6 +12,7 @@ from .Server_Manager_UI import Ui_serverListDialog
 from .AddServerWindowManager import AddServerWindowManager
 from .ThreddsServerInfo import ThreddsServerInfoObject, isValidName, isValidURL
 
+
 class ServerStorageManager(QDialog):
     """Handles persistence of preferences for this application,
     using QGIS settings storage API. Will also handle
@@ -29,6 +30,7 @@ class ServerStorageManager(QDialog):
     by IH (like publishing modules capabilities for animators,
     loaders, ... to be later read and executed by others)
     """
+
     serverSelected = pyqtSignal(ThreddsServerInfoObject)
 
     def __init__(self, parent=None):
@@ -37,7 +39,9 @@ class ServerStorageManager(QDialog):
         super(ServerStorageManager, self).__init__(parent)
         self.IHDomain = "IHCANTABRIA"
         self.PluginDomain = "THREDDS_EXPLORER"
-        self.ThreddsServerGroup = "/".join([self.IHDomain, self.PluginDomain, "servers"])
+        self.ThreddsServerGroup = "/".join(
+            [self.IHDomain, self.PluginDomain, "servers"]
+        )
         self.SettingsGroup = "/".join([self.IHDomain, self.PluginDomain, "settings"])
         self.GDALVersionErrorSetting = "/".join([self.SettingsGroup, "show_gdal_error"])
         self.availableServers = []
@@ -45,11 +49,13 @@ class ServerStorageManager(QDialog):
 
         self.serverListDialog = Ui_serverListDialog()
         self.serverListDialog.setupUi(self)
-        self.serverListDialog.buttonLoadData.clicked.connect(self._onbuttonLoadDataClick)
+        self.serverListDialog.buttonLoadData.clicked.connect(
+            self._onbuttonLoadDataClick
+        )
         self.serverListDialog.buttonAdd.clicked.connect(self._onbuttonAddClick)
         self.serverListDialog.buttonRemove.clicked.connect(self._onbuttonDeleteClick)
         self.reloadTable()
-        #super(ServerStorageManager, self).show()
+        # super(ServerStorageManager, self).show()
 
     def reloadTable(self):
         """Synchronizes the copy of the available servers this object
@@ -58,10 +64,10 @@ class ServerStorageManager(QDialog):
 
         self.availableServers = self.retrieveAllStoredServerInfo()
         table = self.serverListDialog.tableWidget
-        #table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        # table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setRowCount(len(self.availableServers))
         table.setColumnCount(2)
-        table.setHorizontalHeaderLabels("Server Name;Server full URL".split(';'))
+        table.setHorizontalHeaderLabels("Server Name;Server full URL".split(";"))
         table.horizontalHeader().setStretchLastSection(True)
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -100,11 +106,11 @@ class ServerStorageManager(QDialog):
         # for setting in settings.allKeys():
         #     settings.remove(setting)
         defaults = (
-                ('NOAA Oceanwatch', r'http://oceanwatch.pfeg.noaa.gov/thredds'),
-                ('NOAA Operational Model Archive', r'http://nomads.ncdc.noaa.gov/thredds'),
-                ('Santander Meteorology Group', r'http://www.meteo.unican.es/thredds/')
+            ("NOAA Oceanwatch", r"http://oceanwatch.pfeg.noaa.gov/thredds"),
+            ("NOAA Operational Model Archive", r"http://nomads.ncdc.noaa.gov/thredds"),
+            ("Santander Meteorology Group", r"http://www.meteo.unican.es/thredds/"),
         )
-        for name,url in defaults:
+        for name, url in defaults:
             self._saveServerInSettings(ThreddsServerInfoObject(name, url))
 
     def _saveServerInSettings(self, serverInfoObject):
@@ -138,7 +144,7 @@ class ServerStorageManager(QDialog):
 
         for key in settings.childKeys():
             ret = settings.value(key)
-            if type(ret) in [ str, unicode ]:
+            if type(ret) in [str, unicode]:
                 name, url = key, ret
             else:
                 try:
@@ -146,7 +152,7 @@ class ServerStorageManager(QDialog):
                 except:
                     continue
 
-            serverList.append(ThreddsServerInfoObject(name, url));
+            serverList.append(ThreddsServerInfoObject(name, url))
 
         settings.endGroup()
 
@@ -155,25 +161,35 @@ class ServerStorageManager(QDialog):
     def _onbuttonLoadDataClick(self):
         selectedRowNumber = self.serverListDialog.tableWidget.currentRow()
 
-        #Safeguard in case of empty server list or desynchronization between
-        #the server list table and the internal server list.
+        # Safeguard in case of empty server list or desynchronization between
+        # the server list table and the internal server list.
         if selectedRowNumber >= 0 and selectedRowNumber < len(self.availableServers):
             self.serverSelected.emit(self.availableServers[selectedRowNumber])
 
     def _onbuttonAddClick(self):
         self.addServerWindowManager = AddServerWindowManager()
-        self.addServerWindowManager.newServerSubmitted.connect(self._onAttemptToAddNewServer)
+        self.addServerWindowManager.newServerSubmitted.connect(
+            self._onAttemptToAddNewServer
+        )
         self.addServerWindowManager.show()
 
     def _onbuttonDeleteClick(self):
         selectedRow = self.serverListDialog.tableWidget.currentRow()
-        nameColumn = 0 #The column we have the names of the servers shown at.
+        nameColumn = 0  # The column we have the names of the servers shown at.
         deleteTarget = self.serverListDialog.tableWidget.item(selectedRow, nameColumn)
 
-        if deleteTarget: # just in case the user attempts to remove an element when none are shown or selected
-            reply = QMessageBox.question(self, "Confirm deletion",
-                        'Are you sure you want to remove server {s}?"'.format(s=deleteTarget.text()),
-                        QMessageBox.Yes, QMessageBox.No)
+        if (
+            deleteTarget
+        ):  # just in case the user attempts to remove an element when none are shown or selected
+            reply = QMessageBox.question(
+                self,
+                "Confirm deletion",
+                'Are you sure you want to remove server {s}?"'.format(
+                    s=deleteTarget.text()
+                ),
+                QMessageBox.Yes,
+                QMessageBox.No,
+            )
 
             if reply == QMessageBox.Yes:
                 self.deleteServerInfo(deleteTarget.text())
@@ -186,8 +202,10 @@ class ServerStorageManager(QDialog):
         window or show an error message depending on the outcome of this operation."""
 
         if not isValidName(inServerDetails[0]):
-            msg  = "The provided name is not valid.\n"
-            msg += "Make sure it is not empty, and doesn't have any slashes ('/') in it."
+            msg = "The provided name is not valid.\n"
+            msg += (
+                "Make sure it is not empty, and doesn't have any slashes ('/') in it."
+            )
             QMessageBox.warning(self, "Warning", msg)
 
         elif not isValidURL(inServerDetails[1]):
@@ -212,7 +230,7 @@ class ServerStorageManager(QDialog):
         if type(ret) == bool:
             return ret
 
-        elif type(ret) in [ str, unicode ]:
+        elif type(ret) in [str, unicode]:
             ret = ret.lower()
             if ret == "true":
                 return True
@@ -220,7 +238,7 @@ class ServerStorageManager(QDialog):
                 return False
 
         else:
-            return True # default:
+            return True  # default:
 
     @show_GDAL_error.setter
     def show_GDAL_error(self, val):

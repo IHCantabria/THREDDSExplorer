@@ -10,16 +10,22 @@ from PyQt5 import QtCore, QtWidgets
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
+
     def _fromUtf8(s):
         return s
 
+
 try:
     _encoding = QtWidgets.QApplication.UnicodeUTF8
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
+
 except AttributeError:
+
     def _translate(context, text, disambig):
         return QtWidgets.QApplication.translate(context, text, disambig)
+
 
 class Ui_AddServerDialog(object):
     def setupUi(self, AddServerDialog):
@@ -32,20 +38,30 @@ class Ui_AddServerDialog(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.formLayout = QtWidgets.QFormLayout()
-        self.formLayout.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
+        self.formLayout.setFieldGrowthPolicy(
+            QtWidgets.QFormLayout.AllNonFixedFieldsGrow
+        )
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
         self.labelServerBaseURL = QtWidgets.QLabel(AddServerDialog)
         self.labelServerBaseURL.setObjectName(_fromUtf8("labelServerBaseURL"))
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.labelServerBaseURL)
+        self.formLayout.setWidget(
+            1, QtWidgets.QFormLayout.LabelRole, self.labelServerBaseURL
+        )
         self.editServerURL = QtWidgets.QLineEdit(AddServerDialog)
         self.editServerURL.setObjectName(_fromUtf8("editServerURL"))
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.editServerURL)
+        self.formLayout.setWidget(
+            1, QtWidgets.QFormLayout.FieldRole, self.editServerURL
+        )
         self.labelThreddsPath = QtWidgets.QLabel(AddServerDialog)
         self.labelThreddsPath.setObjectName(_fromUtf8("labelThreddsPath"))
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.labelThreddsPath)
+        self.formLayout.setWidget(
+            0, QtWidgets.QFormLayout.LabelRole, self.labelThreddsPath
+        )
         self.editServerName = QtWidgets.QLineEdit(AddServerDialog)
         self.editServerName.setObjectName(_fromUtf8("editServerName"))
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.editServerName)
+        self.formLayout.setWidget(
+            0, QtWidgets.QFormLayout.FieldRole, self.editServerName
+        )
         self.label = QtWidgets.QLabel(AddServerDialog)
         self.label.setObjectName(_fromUtf8("label"))
         self.formLayout.setWidget(2, QtWidgets.QFormLayout.SpanningRole, self.label)
@@ -61,10 +77,16 @@ class Ui_AddServerDialog(object):
         AddServerDialog.setTabOrder(self.editServerURL, self.buttonAddServer)
 
     def retranslateUi(self, AddServerDialog):
-        AddServerDialog.setWindowTitle(_translate("AddServerDialog", "Add new server", None))
-        self.labelServerBaseURL.setText(_translate("AddServerDialog", "Server URL ", None))
-        self.labelThreddsPath.setText(_translate("AddServerDialog", "Server name", None))
-        self.label.setText(_translate("AddServerDialog", "(e.g. http://myserver.com/thredds)", None))
+        AddServerDialog.setWindowTitle(
+            _translate("AddServerDialog", "Add new server", None)
+        )
+        self.labelServerBaseURL.setText(
+            _translate("AddServerDialog", "Server URL ", None)
+        )
+        self.labelThreddsPath.setText(
+            _translate("AddServerDialog", "Server name", None)
+        )
+        self.label.setText(
+            _translate("AddServerDialog", "(e.g. http://myserver.com/thredds)", None)
+        )
         self.buttonAddServer.setText(_translate("AddServerDialog", "Add server", None))
-
-

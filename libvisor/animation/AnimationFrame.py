@@ -24,6 +24,7 @@ from PyQt5.Qt import Qt
 from .AnimationController2 import Controller
 from . import AnimationWCSManager, AnimationWMSManager, Animation_menu
 
+
 class AnimationFrame(QDockWidget):
     """Animation widget UI manager.
 
@@ -32,10 +33,13 @@ class AnimationFrame(QDockWidget):
 
     This interface must be given the MapObject to work with
     """
+
     lock = threading.RLock()
-    errorSignal = pyqtSignal(str) #We will delegate any error reporting to the class which uses this widget.
-    
-    def __init__(self, parent = None):
+    errorSignal = pyqtSignal(
+        str
+    )  # We will delegate any error reporting to the class which uses this widget.
+
+    def __init__(self, parent=None):
         super(AnimationFrame, self).__init__(parent)
         self.parent = parent
         self.animationUI = Animation_menu.Ui_dockAnimationWidget()
@@ -50,32 +54,36 @@ class AnimationFrame(QDockWidget):
         self.animationUI.progressBar.hide()
         self.animationUI.labelInfo.setText("")
         self.animationUI.animationSlider.sliderMoved.connect(self.onUserMovesSlider)
-        #We disable controller to avoid accidental inputs
+        # We disable controller to avoid accidental inputs
         self.animationUI.labelInfo.setEnabled(True)
-        #self.animationUI.animationSlider.setEnabled(False)
-        #self.animationUI.playButton.setEnabled(False)
+        # self.animationUI.animationSlider.setEnabled(False)
+        # self.animationUI.playButton.setEnabled(False)
         self.animationUI.cancelButton.hide()
 
         self.animationUI.addWCSButton.clicked.connect(self._onAddWCSLayerButtonClicked)
         self.animationUI.addWMSButton.clicked.connect(self._onAddWMSLayerButtonClicked)
-        self.animationUI.addOtherButton.clicked.connect(self._onAddOtherLayerButtonClicked)
+        self.animationUI.addOtherButton.clicked.connect(
+            self._onAddOtherLayerButtonClicked
+        )
         self.animationUI.removeButton.clicked.connect(self._removeLayerFromAnimation)
         self.animationUI.cancelButton.clicked.connect(self._onCancelRequested)
         self.animationUI.playButton.clicked.connect(self.play)
         self.animationUI.buttonLoad.clicked.connect(self.prepareAnimation)
         self.layerInfoList = []
-        self.animationUI.frameRateSpinbox.valueChanged.connect(self._newFrameRateSelected)
-        #self.animationUI.timeFrameVariation.timeChanged.connect(self._timeVariationChanged)
-        #self.animationUI.daysFrameVariation.valueChanged.connect(self._timeVariationChanged)
+        self.animationUI.frameRateSpinbox.valueChanged.connect(
+            self._newFrameRateSelected
+        )
+        # self.animationUI.timeFrameVariation.timeChanged.connect(self._timeVariationChanged)
+        # self.animationUI.daysFrameVariation.valueChanged.connect(self._timeVariationChanged)
 
-        #self.animationUI.timeTolerance.timeChanged.connect(self._toleranceChanged)
-        #self.animationUI.daysTolerance.valueChanged.connect(self._toleranceChanged)
+        # self.animationUI.timeTolerance.timeChanged.connect(self._toleranceChanged)
+        # self.animationUI.daysTolerance.valueChanged.connect(self._toleranceChanged)
 
         self.initController()
         self.animationUI.timeFrameVariation.setTime(QTime(1, 0, 0))
         self._timeVariationChanged(QTime(1, 0, 0))
 
-        iface.addDockWidget( Qt.LeftDockWidgetArea, self )
+        iface.addDockWidget(Qt.LeftDockWidgetArea, self)
 
     def initController(self):
         """Initializes a new controller to handle all the animation functions."""
@@ -118,25 +126,39 @@ class AnimationFrame(QDockWidget):
     @pyqtSlot()
     def _onAddWCSLayerButtonClicked(self):
         if self.mapObject and self.mapObject.getWCS():
-            self.addLayerMenu = AnimationWCSManager.AnimationWCSLayerManager(self.mapObject)
+            self.addLayerMenu = AnimationWCSManager.AnimationWCSLayerManager(
+                self.mapObject
+            )
             self.addLayerMenu.animationLayerCreated.connect(self._addLayerToAnimation)
             self.addLayerMenu.show()
         else:
-            self.onError("A map must first be selected\nin THREDDS Explorer catalog view.")
+            self.onError(
+                "A map must first be selected\nin THREDDS Explorer catalog view."
+            )
 
     @pyqtSlot()
     def _onAddWMSLayerButtonClicked(self):
         if self.mapObject:
             try:
-                self.addLayerMenu = AnimationWMSManager.AnimationWMSLayerManager(self.mapObject)
-                self.addLayerMenu.animationLayerCreated.connect(self._addLayerToAnimation)
+                self.addLayerMenu = AnimationWMSManager.AnimationWMSLayerManager(
+                    self.mapObject
+                )
+                self.addLayerMenu.animationLayerCreated.connect(
+                    self._addLayerToAnimation
+                )
                 self.addLayerMenu.show()
             except (HTTPException, URLError, timeout):
-                #self.onError("Connection error: Server or resource unreachable.")
-                #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-                iface.messageBar().pushMessage("THREDDS Explorer", "Connection error: Server or resource unreachable.", level=Qgis.Critical)
+                # self.onError("Connection error: Server or resource unreachable.")
+                # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                iface.messageBar().pushMessage(
+                    "THREDDS Explorer",
+                    "Connection error: Server or resource unreachable.",
+                    level=Qgis.Critical,
+                )
         else:
-            self.onError("A map must first be selected\nin THREDDS Explorer catalog view.")
+            self.onError(
+                "A map must first be selected\nin THREDDS Explorer catalog view."
+            )
 
     @pyqtSlot()
     def _onAddOtherLayerButtonClicked(self):
@@ -161,10 +183,12 @@ class AnimationFrame(QDockWidget):
     def onUserMovesSlider(self, newValue):
         if self.controller is not None:
             self.controller.setCurrentFrame(newValue)
-            time.sleep(0.1) #Dirty hack to avoid an extreme number of value updates per second.
+            time.sleep(
+                0.1
+            )  # Dirty hack to avoid an extreme number of value updates per second.
 
     def _updateTable(self):
-        """Updates the visual reference of which layers and maps are queued for animation. """
+        """Updates the visual reference of which layers and maps are queued for animation."""
 
         table = self.animationUI.tableLayerList
         table.setRowCount(len(self.layerInfoList))
@@ -172,20 +196,20 @@ class AnimationFrame(QDockWidget):
         table.setHorizontalHeaderLabels("Map;Layer;times".split(";"))
         table.horizontalHeader().setStretchLastSection(True)
         for (i, item) in enumerate(self.layerInfoList):
-            #If there is no MapObject in this element it probably
-            #is because it is an external layer. We will only use
-            #the AnimationLayer built-in name then.
+            # If there is no MapObject in this element it probably
+            # is because it is an external layer. We will only use
+            # the AnimationLayer built-in name then.
             try:
-                table.setItem(i,0, QTableWidgetItem(item.getMapObject().getName()))
+                table.setItem(i, 0, QTableWidgetItem(item.getMapObject().getName()))
             except AttributeError:
-                table.setItem(i,0, QTableWidgetItem(item.getLayerName()))
+                table.setItem(i, 0, QTableWidgetItem(item.getLayerName()))
 
-            table.setItem(i,1, QTableWidgetItem(item.getLayerName()))
-            table.setItem(i,2, QTableWidgetItem(str(item.getTimes())))
+            table.setItem(i, 1, QTableWidgetItem(item.getLayerName()))
+            table.setItem(i, 2, QTableWidgetItem(str(item.getTimes())))
 
     @pyqtSlot()
     def _updateProgressBar(self):
-        self.animationUI.progressBar.setValue(self.animationUI.progressBar.value()+1)
+        self.animationUI.progressBar.setValue(self.animationUI.progressBar.value() + 1)
 
     @pyqtSlot(tuple)
     def _updateSeekBar(self, infoTuple):
@@ -204,26 +228,24 @@ class AnimationFrame(QDockWidget):
 
     @pyqtSlot(object)
     def _timeVariationChanged(self, value):
-        vhours = self.animationUI.timeFrameVariation.time().hour() \
-                + (self.animationUI.daysFrameVariation.value() * 24)
+        vhours = self.animationUI.timeFrameVariation.time().hour() + (
+            self.animationUI.daysFrameVariation.value() * 24
+        )
         vminutes = self.animationUI.timeFrameVariation.time().minute()
         vseconds = self.animationUI.timeFrameVariation.time().second()
-        delta = timedelta(hours = vhours,\
-                          minutes= vminutes,\
-                          seconds= vseconds)
+        delta = timedelta(hours=vhours, minutes=vminutes, seconds=vseconds)
 
         self.controller.setTimeDeltaPerFrame(delta)
         self.animationUI.animationSlider.setMaximum(self.controller.getNumberOfFrames())
 
     @pyqtSlot(object)
     def _toleranceChanged(self):
-        vhours = self.animationUI.timeTolerance.time().hour() \
-                + (self.animationUI.daysTolerance.value() * 24)
+        vhours = self.animationUI.timeTolerance.time().hour() + (
+            self.animationUI.daysTolerance.value() * 24
+        )
         vminutes = self.animationUI.timeTolerance.time().minute()
         vseconds = self.animationUI.timeTolerance.time().second()
-        tolerance = timedelta(hours = vhours,\
-                          minutes= vminutes,\
-                          seconds= vseconds)
+        tolerance = timedelta(hours=vhours, minutes=vminutes, seconds=vseconds)
 
         self.controller.setTimeDeviationTolerance(tolerance)
 
@@ -261,12 +283,16 @@ class AnimationFrame(QDockWidget):
             self.animationUI.progressBar.setMinimum(0)
             self.animationUI.progressBar.setValue(0)
             self.controller.setUpAnimation(self.layerInfoList)
-            self.animationUI.progressBar.setMaximum(self.controller.getMaxProgressValue())
+            self.animationUI.progressBar.setMaximum(
+                self.controller.getMaxProgressValue()
+            )
             self.controller.setFrameRate(self.animationUI.frameRateSpinbox.value())
         except AttributeError as e:
-            #self.onError(str(e))
-            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-            iface.messageBar().pushMessage("THREDDS Explorer", "Invalid data provided.", level=Qgis.Critical)
+            # self.onError(str(e))
+            # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage(
+                "THREDDS Explorer", "Invalid data provided.", level=Qgis.Critical
+            )
 
     def play(self):
         self.animationUI.labelInfo.show()
@@ -283,7 +309,7 @@ class AnimationFrame(QDockWidget):
         self.animationUI.progressBar.hide()
         self.animationUI.animationSlider.setMaximum(self.controller.getNumberOfFrames())
         self.animationUI.cancelButton.hide()
-        self.controller.setCurrentFrame(0) #We show the user the first frame.
+        self.controller.setCurrentFrame(0)  # We show the user the first frame.
 
     @pyqtSlot()
     def _onAnimationPlaybackFinish(self):

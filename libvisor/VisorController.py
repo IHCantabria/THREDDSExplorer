@@ -22,6 +22,7 @@ from .persistence.ServerDataPersistenceManager import ServerStorageManager
 from .providersmanagers.wcs.WCSBatchDownloadUtil import WCSDownloadWorkerThread
 from .providersmanagers.wms.WMSBatchDownloadUtil import WMSDownloadWorkerThread
 
+
 class VisorController(QObject):
     """Links UI and data from Visor_WMS project.
 
@@ -60,7 +61,7 @@ class VisorController(QObject):
         self.serverDataService = None
         self.temporaryDirectoryPath = tempfile.gettempdir()
 
-    def showServerManager(self, parent = None):
+    def showServerManager(self, parent=None):
         """Shows the QDialog assigned to the persistent data manager,
         which currently (only) holds the server information.
         """
@@ -86,14 +87,20 @@ class VisorController(QObject):
         """
         try:
             serverName = threddsServerInfoObj.getName()
-            self.standardMessage.emit("Loading datasets from "+serverName)
-            self.InfoService = TMR.ThreddsCatalogInfo(threddsServerInfoObj.getURL(), serverName)
-            self.InfoService.threddsServerMapObjectRetrieved.connect(self._onNewDataSetListRetrieved)
+            self.standardMessage.emit("Loading datasets from " + serverName)
+            self.InfoService = TMR.ThreddsCatalogInfo(
+                threddsServerInfoObj.getURL(), serverName
+            )
+            self.InfoService.threddsServerMapObjectRetrieved.connect(
+                self._onNewDataSetListRetrieved
+            )
             self.asyncQueryDataset(depth)
             self.serverDataService.hide()
         except (HTTPException, URLError, ValueError, timeout):
             self.errorMessage.emit("Error fetching datasets: Server unreachable")
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
 
     def asyncQueryDataset(self, depth=0):
         """Will request an asynchronous update of the underlying
@@ -104,17 +111,23 @@ class VisorController(QObject):
         QT signal which expects a list of DataSet objects.
         """
         try:
-            threading.Thread(target = self._fetchDatasetList, args=(depth,)).start()
+            threading.Thread(target=self._fetchDatasetList, args=(depth,)).start()
         except (HTTPException, URLError, ValueError, timeout):
-            self.errorMessage.emit("Error fetching datasets: Server unreachable or corrupt data found.")
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            self.errorMessage.emit(
+                "Error fetching datasets: Server unreachable or corrupt data found."
+            )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
 
     def _fetchDatasetList(self, depth):
         try:
             self.InfoService.fetchAvailableDatasets(depth)
         except (HTTPException, URLError, ValueError, timeout) as e:
             self.errorMessage.emit("Error fetching datasets: URL not found")
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
 
     @pyqtSlot(list, str)
     def _onNewDataSetListRetrieved(self, dataSetList, serverName):
@@ -157,7 +170,9 @@ class VisorController(QObject):
             self.threddsDataSetUpdated.emit(dataSetObject)
         except (HTTPException, URLError, ValueError, timeout):
             self.errorMessage.emit("Error fetching datasets: Server unreachable")
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
 
     def getMapObject(self, mapName, parentSetName, projectDataSet):
         """Will take the requested map name (mapName), the map parent sub set
@@ -185,36 +200,45 @@ class VisorController(QObject):
         :rtype:     threddsFetcherRecursos.Map
 
         """
-        #If the map may belong to the base set...
+        # If the map may belong to the base set...
         if parentSetName is None or parentSetName == projectDataSet.getName():
-            mapInfoList = projectDataSet.searchMapsByName(mapName,exactMatch = True)
-        #If it doesn't seem to belong to the base set...
+            mapInfoList = projectDataSet.searchMapsByName(mapName, exactMatch=True)
+        # If it doesn't seem to belong to the base set...
         else:
-            chosenSet = projectDataSet.searchSubsetsByName(parentSetName, exactMatch = True)
-            if(len(chosenSet)>1):
-                self.errorMessage.emit("- Set integrity error. Multiple results found for this item.")
+            chosenSet = projectDataSet.searchSubsetsByName(
+                parentSetName, exactMatch=True
+            )
+            if len(chosenSet) > 1:
+                self.errorMessage.emit(
+                    "- Set integrity error. Multiple results found for this item."
+                )
                 return
-            elif(len(chosenSet)==0):
-                self.errorMessage.emit("- Set integrity error. No results found for this item.")
+            elif len(chosenSet) == 0:
+                self.errorMessage.emit(
+                    "- Set integrity error. No results found for this item."
+                )
                 return
             else:
                 parentSet = chosenSet[0]
-                mapInfoList = parentSet.searchMapsByName(mapName,exactMatch = True)
+                mapInfoList = parentSet.searchMapsByName(mapName, exactMatch=True)
 
-        if(len(mapInfoList)>1):
-                self.errorMessage.emit("Map list integrity error. Multiple results found for this item.")
-                return None
-        elif(len(mapInfoList)==0):
-            #self.errorMessage.emit("Map list integrity error. No results found for this item.")
+        if len(mapInfoList) > 1:
+            self.errorMessage.emit(
+                "Map list integrity error. Multiple results found for this item."
+            )
+            return None
+        elif len(mapInfoList) == 0:
+            # self.errorMessage.emit("Map list integrity error. No results found for this item.")
             return None
         else:
             try:
-                #print("emitting from controller... "+str(mapInfoList.values()[0]))
+                # print("emitting from controller... "+str(mapInfoList.values()[0]))
                 self.mapInfoRetrieved.emit(list(mapInfoList.values())[0])
             except IndexError:
-                QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+                QgsMessageLog.logMessage(
+                    traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+                )
                 return None
-
 
     ###                                  ###
     ### WMS retrieval related operations ###
@@ -237,19 +261,23 @@ class VisorController(QObject):
                 return WMSreader.getMapInfo()
             else:
                 return None
-        except (HTTPException,urllib.error.URLError, timeout) as e:
-            if (e.code == 401):
+        except (HTTPException, urllib.error.URLError, timeout) as e:
+            if e.code == 401:
                 self.notAuthorized()
-                    
+
     def notAuthorized(self):
         notAuth = NotAuthorized.NotAuthorized()
         if notAuth.exec_() == QtWidgets.QDialog.Accepted:
-            QgsMessageLog.logMessage(traceback.format_exc(), "Protected dataset, not authorized", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(),
+                "Protected dataset, not authorized",
+                QgsMessageLog.CRITICAL,
+            )
             self.standardMessage.emit("Protected dataset, not authorized")
 
-                
-
-    def _retrieveWMSMapImage(self, threddsMapObject, layerName, styleName, timeRequested, boundingBox):
+    def _retrieveWMSMapImage(
+        self, threddsMapObject, layerName, styleName, timeRequested, boundingBox
+    ):
         """Async call to retrieve the image from server.
         Potentially long-running operation to be done
         off the main thread.
@@ -257,17 +285,27 @@ class VisorController(QObject):
         Will post result through the mapImageRetrieved
         signal to any registered listeners.
         """
-        #print("_retrieveWMSMapImage"+layerName+"--"+timeRequested+"++"+str(threddsMapObject))
+        # print("_retrieveWMSMapImage"+layerName+"--"+timeRequested+"++"+str(threddsMapObject))
         if threddsMapObject is not None and threddsMapObject.getWMS() is not None:
-            self.standardMessage.emit("Downloading '"+layerName+"' [WMS], please wait...")
+            self.standardMessage.emit(
+                "Downloading '" + layerName + "' [WMS], please wait..."
+            )
             lectorWMS = WMS.WMSparser(threddsMapObject.getWMS())
-            lectorWMS.createMapLayer(layerName,styleName,boundingBox, timeRequested)
-            resultImage = (lectorWMS.getLastCreatedMapLayer(),layerName,"WMS")
-            QgsMessageLog.logMessage("WMS Layer Name: " + layerName, "THREDDS Explorer", QgsMessageLog.INFO )
-            QgsMessageLog.logMessage("WMS timeRequested: " + timeRequested, "THREDDS Explorer", QgsMessageLog.INFO )
+            lectorWMS.createMapLayer(layerName, styleName, boundingBox, timeRequested)
+            resultImage = (lectorWMS.getLastCreatedMapLayer(), layerName, "WMS")
+            QgsMessageLog.logMessage(
+                "WMS Layer Name: " + layerName, "THREDDS Explorer", QgsMessageLog.INFO
+            )
+            QgsMessageLog.logMessage(
+                "WMS timeRequested: " + timeRequested,
+                "THREDDS Explorer",
+                QgsMessageLog.INFO,
+            )
             self.mapImageRetrieved.emit(resultImage)
 
-    def asyncFetchWMSImageFile(self, threddsMapObject, layerName, styleName, timeRangeRequested, boundingBox):
+    def asyncFetchWMSImageFile(
+        self, threddsMapObject, layerName, styleName, timeRangeRequested, boundingBox
+    ):
         """Will perform an async request for the layer to the WMS server,
         and return it to the calling object through the WMSprocessdone
         signal.
@@ -284,12 +322,22 @@ class VisorController(QObject):
         :returns: QGIS Raster Layer object through the WMSprocessdone signal.
         :rtype: QgsRasterLayer
         """
-        if timeRangeRequested is None or len(timeRangeRequested) ==0:
-            threading.Thread(target = self._retrieveWMSMapImage,
-             args=(threddsMapObject,layerName,styleName,"", boundingBox)).start()
+        if timeRangeRequested is None or len(timeRangeRequested) == 0:
+            threading.Thread(
+                target=self._retrieveWMSMapImage,
+                args=(threddsMapObject, layerName, styleName, "", boundingBox),
+            ).start()
         elif len(timeRangeRequested) == 1:
-            threading.Thread(target = self._retrieveWMSMapImage,
-             args=(threddsMapObject,layerName,styleName,timeRangeRequested[0], boundingBox)).start()
+            threading.Thread(
+                target=self._retrieveWMSMapImage,
+                args=(
+                    threddsMapObject,
+                    layerName,
+                    styleName,
+                    timeRangeRequested[0],
+                    boundingBox,
+                ),
+            ).start()
         else:
             self.standardMessage.emit("Downloading maps, please wait...")
             wmsBatchWorkerThread = WMSDownloadWorkerThread(
@@ -298,8 +346,9 @@ class VisorController(QObject):
                 layerName,
                 styleName,
                 boundingBox,
-                jobName = threddsMapObject.getName()+"_"+layerName+"_"+styleName)
-            thread = threading.Thread(target = wmsBatchWorkerThread.run)
+                jobName=threddsMapObject.getName() + "_" + layerName + "_" + styleName,
+            )
+            thread = threading.Thread(target=wmsBatchWorkerThread.run)
             wmsBatchWorkerThread.WMSprocessdone.connect(self.BatchWorkerThreadDone)
             thread.start()
 
@@ -307,7 +356,9 @@ class VisorController(QObject):
     ### WCS retrieval related operations ###
     ###                                  ###
 
-    def asyncFetchWCSImageFile(self, threddsMapObject, coverageName, timeRangeRequested, boundingBox):
+    def asyncFetchWCSImageFile(
+        self, threddsMapObject, coverageName, timeRangeRequested, boundingBox
+    ):
         """Will perform an async request for the layer to the WCS server,
         and return it to the calling object through the WCSProcessdone
         signal.
@@ -327,22 +378,32 @@ class VisorController(QObject):
         :returns: QGIS Raster Layer object through WCSProcessdone QtSignal.
         :rtype: QgsRasterLayer
         """
-        if timeRangeRequested is None or len(timeRangeRequested) ==0:
-            #print("0 time!")
-            threading.Thread(target = self._retrieveWCSMapImage,
-             args=(threddsMapObject,coverageName,"", boundingBox)).start()
+        if timeRangeRequested is None or len(timeRangeRequested) == 0:
+            # print("0 time!")
+            threading.Thread(
+                target=self._retrieveWCSMapImage,
+                args=(threddsMapObject, coverageName, "", boundingBox),
+            ).start()
         elif len(timeRangeRequested) == 1:
-            threading.Thread(target = self._retrieveWCSMapImage,
-             args=(threddsMapObject,coverageName,timeRangeRequested[0], boundingBox)).start()
+            threading.Thread(
+                target=self._retrieveWCSMapImage,
+                args=(
+                    threddsMapObject,
+                    coverageName,
+                    timeRangeRequested[0],
+                    boundingBox,
+                ),
+            ).start()
         else:
             self.standardMessage.emit("Downloading maps, please wait...")
             wcsBatchWorkerThread = WCSDownloadWorkerThread(
-                       threddsMapObject.getWCS().getCapabilitiesURL(),
-                       timeRangeRequested,
-                       coverageName,
-                       boundingBox = boundingBox,
-                       jobName = threddsMapObject.getName()+"_"+coverageName)
-            thread = threading.Thread(target = wcsBatchWorkerThread.run)
+                threddsMapObject.getWCS().getCapabilitiesURL(),
+                timeRangeRequested,
+                coverageName,
+                boundingBox=boundingBox,
+                jobName=threddsMapObject.getName() + "_" + coverageName,
+            )
+            thread = threading.Thread(target=wcsBatchWorkerThread.run)
             wcsBatchWorkerThread.WCSProcessdone.connect(self.BatchWorkerThreadDone)
             thread.start()
 
@@ -354,7 +415,7 @@ class VisorController(QObject):
         Will post result through the mapImageRetrieved signal
         so it can be processed in main thread.
         """
-        #print("_retrieveWCSMapImage"+coverageName+"--"+timeRequested+"++"+str(threddsMapObject))
+        # print("_retrieveWCSMapImage"+coverageName+"--"+timeRequested+"++"+str(threddsMapObject))
         if threddsMapObject and threddsMapObject.getWCS():
             msg = "Downloading {cn} [WCS], please wait...".format(cn=coverageName)
             self.standardMessage.emit(msg)
@@ -362,12 +423,16 @@ class VisorController(QObject):
             imageurl = threddsMapObject.getWCS().getCapabilitiesURL()
             lectorWCS = WCS.WCSparser(imageurl)
 
-            msg  = "WCS capabilities URL: {img}\n".format(img=imageurl)
+            msg = "WCS capabilities URL: {img}\n".format(img=imageurl)
             msg += "WCS timeRequested: {tr}\n".format(tr=timeRequested)
             msg += "WCS coverage: {cn}".format(cn=coverageName)
             QgsMessageLog.logMessage(msg, "THREDDS Explorer", QgsMessageLog.INFO)
 
-            resultImage = (lectorWCS.generateLayer(coverageName, timeRequested, boundingBox=bbox), coverageName, "WCS")
+            resultImage = (
+                lectorWCS.generateLayer(coverageName, timeRequested, boundingBox=bbox),
+                coverageName,
+                "WCS",
+            )
             self.mapImageRetrieved.emit(resultImage)
 
     def getWCSCoverages(self, mapObject):
@@ -388,8 +453,10 @@ class VisorController(QObject):
             else:
                 return None
         except (HTTPException, URLError, timeout) as e:
-            #QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
-            iface.messageBar().pushMessage("THREDDS Explorer", str(e), level=Qgis.Critical)
+            # QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            iface.messageBar().pushMessage(
+                "THREDDS Explorer", str(e), level=Qgis.Critical
+            )
             return None
 
     @pyqtSlot(dict, WMSDownloadWorkerThread)
@@ -399,9 +466,13 @@ class VisorController(QObject):
         :type  layerDictionary: dict {time:layer}
         """
         try:
-            self.batchDownloadFinished.emit(list(layerDictionary.values()), workerObject.getJobName())
+            self.batchDownloadFinished.emit(
+                list(layerDictionary.values()), workerObject.getJobName()
+            )
         except KeyError:
-            QgsMessageLog.logMessage(traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+            )
             # Might happen if a thread is cancelled in the last frame download,
             # as it'll already have been queued for removal from the threadsInUse dict
             pass
