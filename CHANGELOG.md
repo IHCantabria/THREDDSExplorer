@@ -1,64 +1,70 @@
-**CURRENT**
+**v2.0.1** (2019-10-10)
 
-* ServerDataPersistenceManager.py
-    - Fixed persistence of server list in Linux converting them to new format 
+- Update to QGIS 3.x (3.4 and 3.8 tested)
+- Implemented not authorized window
+- Bug fixes
 
+**v1.2** (2016-08-05)
 
-* AnimationController2.py, AnimationWMSManager.py, WMSBatchDownloadUtil.py, WMSParser.py
-    - Added functionality to work with editable bbox
+- ServerDataPersistenceManager.py
 
+  - Fixed persistence of server list in Linux converting them to new format
 
-* Visor_UI.py
-     - Added feedback when loading WCS layers with invalid bbox
-     - Added functionality to work with editable bbox
+- AnimationController2.py, AnimationWMSManager.py, WMSBatchDownloadUtil.py, WMSParser.py
 
+  - Added functionality to work with editable bbox
 
-* THREDDS_Explorer_dockwidget_base.ui, Animation_add_wcs_layer.ui
-    - Modified interface with editable values for WCS boundingBox
+- Visor_UI.py
 
+  - Added feedback when loading WCS layers with invalid bbox
+  - Added functionality to work with editable bbox
 
-* Utilities.py
-    - Added function to check platform (Windows vs Linux)
+- THREDDS_Explorer_dockwidget_base.ui, Animation_add_wcs_layer.ui
 
+  - Modified interface with editable values for WCS boundingBox
 
-* WCSParser.py
-    - Solved bug when loading WCS layers: Creation of a temporal file to store the .tiff from the WCS request
-    - Added functionality to work with editable bbox
+- Utilities.py
 
+  - Added function to check platform (Windows vs Linux)
 
-* icon.png
-    - Replaced the plugin icon (grey) to new one (blue)
+- WCSParser.py
+
+  - Solved bug when loading WCS layers: Creation of a temporal file to store the .tiff from the WCS request
+  - Added functionality to work with editable bbox
+
+- icon.png
+  - Replaced the plugin icon (grey) to new one (blue)
 
 **v1.1** (2016-06-10)
 
-* ServerDataPersistenceManager.py
-    - Solved bug when reading variable "GDALVersionErrorSetting" (2016.06.06)
+- ServerDataPersistenceManager.py
 
+  - Solved bug when reading variable "GDALVersionErrorSetting" (2016.06.06)
 
-* Visor_UI.py
-    - Moved GDAL version warning to WCS tab for Linux users
+- Visor_UI.py
 
+  - Moved GDAL version warning to WCS tab for Linux users
 
-* ServerDataPersistenceManager.py
-    - Do not show server list window on `__init__` method
+- ServerDataPersistenceManager.py
 
+  - Do not show server list window on `__init__` method
 
-* VisorController.py
-    - Show server list window when button is clicked
+- VisorController.py
 
+  - Show server list window when button is clicked
 
-* THREDDS_Explorer_dockwidget_base.ui, THREDDS_Explorer_dockwidget.py
-    - Add vertical and horizontal scrolls to the plugin's main user interface
+- THREDDS_Explorer_dockwidget_base.ui, THREDDS_Explorer_dockwidget.py
 
+  - Add vertical and horizontal scrolls to the plugin's main user interface
 
-* General
+- General
   - Trace errors into QGIS/THREDDSExplorer registry tab
   - ui2py: script to automate .ui to .py conversion (2016-06-10)
 
 **v1.0** (2016-05-31)
 
-* Connect to THREDDS Server
-* List THREDDS Server contents
-* Download WMS
-* Download WCS
-* Animate WMS/WCS layers
+- Connect to THREDDS Server
+- List THREDDS Server contents
+- Download WMS
+- Download WCS
+- Animate WMS/WCS layers
