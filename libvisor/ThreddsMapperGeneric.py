@@ -561,7 +561,11 @@ class ThreddsCatalogInfo(QObject):
         :rtype   String
         """
 
-        if "http:" in dataSetCatalogURL.lower() or "www." in dataSetCatalogURL.lower():
+        if (
+            "http:" in dataSetCatalogURL.lower()
+            or "https:" in dataSetCatalogURL.lower()
+            or "www." in dataSetCatalogURL.lower()
+        ):
             url = dataSetCatalogURL
         else:
             if parentCatalogURL == None:
