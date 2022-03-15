@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from http.client import HTTPException
 from urllib.request import URLError
 import urllib.request
-from qgis.core import QgsMessageLog
+from qgis.core import QgsMessageLog, Qgis
 from qgis.core import *
 from qgis.utils import iface
 import traceback
@@ -269,7 +269,7 @@ class ThreddsCatalogInfo(QObject):
             )
         except (HTTPException, URLError, ValueError) as e:
             QgsMessageLog.logMessage(
-                traceback.format_exc(), "THREDDS Explorer", QgsMessageLog.CRITICAL
+                traceback.format_exc(), "THREDDS Explorer", Qgis.Critical
             )
             raise e
 

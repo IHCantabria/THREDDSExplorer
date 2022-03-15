@@ -181,7 +181,7 @@ class Controller(QObject):
                     QgsMessageLog.logMessage(
                         traceback.format_exc(),
                         "THREDDS Explorer",
-                        QgsMessageLog.CRITICAL,
+                        Qgis.Critical,
                     )
                 self.framesShown.append(layer)
             except KeyError:
