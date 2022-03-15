@@ -262,7 +262,7 @@ class WMSparser(QObject):
 
         for moment in listOfTimes:
             # print("BATCH RANGES CALCULATOR: "+str(moment)+" at system time "+str(datetime.datetime.now()))
-            while len([x for x in threads if x.isAlive() == True]) > 4:
+            while len([x for x in threads if x.is_alive() == True]) > 4:
                 time.sleep(0.2)
             self.singleRangeBeginsChecking.emit()
             pathForJSON = self.WMSValueRangeCheckURL.format(
@@ -278,7 +278,7 @@ class WMSparser(QObject):
             thread.start()
 
         try:
-            while len([x for x in threads if x.isAlive() == True]) != 0:
+            while len([x for x in threads if x.is_alive() == True]) != 0:
                 time.sleep(0.2)
 
             # print(str(self.minRange) +"_"+ str(self.maxRange))
