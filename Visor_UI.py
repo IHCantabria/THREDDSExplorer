@@ -743,7 +743,8 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         if layer and layer.isValid():
             QgsProject.instance().addMapLayer(layer)
             iface.zoomToActiveLayer()
-            iface.legendInterface().refreshLayerSymbology(layer)
+            # iface.legendInterface().refreshLayerSymbology(layer)
+            iface.layerTreeView().refreshLayerSymbology(layer.id())
         else:
             self.postInformationMessageToUser("There was a problem loading the layer.")
 
