@@ -741,7 +741,7 @@ class Visor(QtWidgets.QDockWidget, FORM_CLASS):
         )
         layer = image[0]
         if layer and layer.isValid():
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            QgsProject.instance().addMapLayer(layer)
             iface.zoomToActiveLayer()
             iface.legendInterface().refreshLayerSymbology(layer)
         else:
