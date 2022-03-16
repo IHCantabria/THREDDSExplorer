@@ -1,3 +1,8 @@
+**v2.0.2** (2022-03-16)
+
+- Update components to QGIS 3.x
+- Bug fixes
+
 **v2.0.1** (2019-10-10)
 
 - Update to QGIS 3.x (3.4 and 3.8 tested)
